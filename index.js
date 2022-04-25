@@ -21,6 +21,6 @@ app.use('/auth',authRoutes);
 //settings
 app.set('json spaces',4);
 
-app.listen(3001, ()=>{
-    console.log('server on port ',3001)
+app.listen(process.env.PORT || 3001, ()=>{
+    console.log('server on port ', process.env.PORT || 3001)
 })

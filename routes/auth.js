@@ -25,7 +25,7 @@ router.route('/login')
                     "commands":`SELECT password FROM USERSDATABASE where email='${email}';`,
                     "limit":10,
                     "separator":";",
-                    "stop_on_error":"no"
+                    "stop_on_error":"yes"
                 }
                 const queryConf = {
                     headers: {
@@ -36,19 +36,23 @@ router.route('/login')
                 }
                 axios.post(queryURL,queryData,queryConf)
                 .then(response => {
-
+                    console.log(response.data)
                     const getDataUrl = `${queryURL}/${response.data.id}`
                     axios.get(getDataUrl,queryConf)
                         .then(response => {
-                            console.log(response.data.results[0].rows[0][0])
-
-                            if(pwd===response.data.results[0].rows[0][0]){
-                                res.json({"results":"login succesful"})
-                            }else{
-                                res.json({"results":"login not succesful"})
+                            try{
+                                console.log(response.data.results[0].rows[0][0])
+                                if(pwd===response.data.results[0].rows[0][0]){
+                                    res.json({"results":"login succesful"})
+                                }else{
+                                    res.json({"results":"login declined"})
+                                }
+                            } catch(error){
+                                console.error(error);
+                                res.json({"results":"error"})
                             }
                         })
-                })                    
+                })            
             });
     })
 
