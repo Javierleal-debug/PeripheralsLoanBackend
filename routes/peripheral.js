@@ -15,7 +15,7 @@ router.route('/')
 
 router.route('/:serialNumber')
     .get([hasToken,verifyToken],controller.peripheral)
-    .update([hasToken,verifyToken],controller.updatePeripheral)
-    .delete([hasToken,verifyToken],controller.detelePeripheral)
+    .put([hasToken,verifyToken],controller.updatePeripheral)
+    .delete([hasToken,verifyToken],controller.deletePeripheral)
 
 module.exports=router; 
