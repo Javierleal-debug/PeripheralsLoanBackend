@@ -12,6 +12,7 @@ const { hasToken,verifyToken } = require('../middleware/authJwt');
 router.route('/')
     .get([hasToken,verifyToken],controller.peripherals)
     .post([hasToken,verifyToken],controller.addPeripheral)
+    .delete([hasToken,verifyToken],controller.deletePeripherals)
 
 router.route('/:serialNumber')
     .get([hasToken,verifyToken],controller.peripheral)

@@ -196,3 +196,44 @@ module.exports.deletePeripheral = (req,res) => {
         })            
     });
 }
+
+module.exports.deletePeripherals = (req,res) => {
+    const serialNumber = [];
+    req.body.array.forEach((i)=>{
+        serialNumber.push("'" + i + "'");
+    });
+    axios.post( authUrl, authData, authConf)
+    .then( response => {
+        // Making query
+        const token = response.data.access_token
+        const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
+        const queryData = {
+            "commands":`delete from device where serialNumber in (${serialNumber});`,//modificar "query data" con el query SQL
+            "limit":10000,
+            "separator":";",
+            "stop_on_error":"yes"
+        }
+        const queryConf = {
+            headers: {
+                "authorization": `Bearer ${token}`,
+                "csontent-Type": 'application/json',
+                "x-deployment-id": credentials.DB_DEPLOYMENT_ID
+            }
+        }
+        axios.post(queryURL,queryData,queryConf)
+        .then(response => {
+            const getDataUrl = `${queryURL}/${response.data.id}`
+            axios.get(getDataUrl,queryConf)
+                .then(response => {
+                    try{
+                        //manejas informacion que pediste por el query
+                        console.log(response.data/*.results[0]*/)
+                        res.json({message:"success"})//respuesta con success(json)
+                    } catch(error){
+                        console.error(error);//errorHandling
+                        res.status(404).json({message:"User not found"})
+                    }
+                })
+        })            
+    });
+}
