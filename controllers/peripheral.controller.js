@@ -129,7 +129,7 @@ module.exports.updatePeripheral = (req,res) => {
         const token = response.data.access_token
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
-            "commands":`update device set type='${type}',brand='${brand}','${model}' where serialNumber='${serialNumber}';`,//modificar "query data" con el query SQL
+            "commands":`update device set type='${type}', brand='${brand}', model='${model}' where serialNumber='${serialNumber}';`,
             "limit":10000,
             "separator":";",
             "stop_on_error":"yes"
@@ -148,7 +148,7 @@ module.exports.updatePeripheral = (req,res) => {
                 .then(response => {
                     try{
                         //manejas informacion que pediste por el query
-                        console.log(response.data.results[0].rows)
+                        console.log(response.data.results[0])
                         res.json({message:"success"})//respuesta con success(json)
                     } catch(error){
                         console.error(error);//errorHandling
@@ -167,7 +167,7 @@ module.exports.deletePeripheral = (req,res) => {
         const token = response.data.access_token
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
-            "commands":`delete from device where serialNumber='${serialNumber}';`,//modificar "query data" con el query SQL
+            "commands":`delete from device where serialNumber='${serialNumber}';`,
             "limit":10000,
             "separator":";",
             "stop_on_error":"yes"
