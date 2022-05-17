@@ -21,7 +21,7 @@ module.exports.signin = (req,res)=>{
             const token = response.data.access_token
             const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
             const queryData = {
-                "commands":`SELECT password FROM USERSDATABASE where email='${email}';`,
+                "commands":`SELECT * FROM USERS where email='${email}';`,//cambiar de tabla a users
                 "limit":10,
                 "separator":";",
                 "stop_on_error":"yes"
@@ -39,16 +39,17 @@ module.exports.signin = (req,res)=>{
                 axios.get(getDataUrl,queryConf)
                     .then(response => {
                         try{
+                            var userData=response.data.results[0].rows[0];
                             var passwordIsValid = bcrypt.compareSync(
                                 req.body.pwd,
-                                response.data.results[0].rows[0][0]
+                                response.data.results[0].rows[0][6]
                             );
                     
                             if (!passwordIsValid) {
                                 return res.status(401).send({message: "Invalid Password"});
                             }
                             
-                            var token = jwt.sign({id: email}, config.secret, {expiresIn: 86400})
+                            var token = jwt.sign({name:userData[0],id: email,serial:userData[2],area:userData[3],mngrName:userData[4],mngrEmail:userData[5],userType:userData[7]}, config.secret, {expiresIn: 86400})//añadir tipo de usuario en el token
                             
                             //console.log(token);
 
@@ -67,6 +68,7 @@ module.exports.signin = (req,res)=>{
 }
 
 module.exports.signup = (req,res) => {
+    let mngrtoken = req.headers["x-access-token"];
     const userid=req.body.userid;
     const email=req.body.email;
     const name=req.body.name;

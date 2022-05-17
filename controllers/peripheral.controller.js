@@ -1,5 +1,7 @@
 const axios = require('axios');
 const credentials = require('../config/credentials.json');
+const jwt = require('jsonwebtoken')
+const config = require('../config/auth.config');
 
 const authUrl = 'https://iam.cloud.ibm.com/identity/token'; 
 const authData = `grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey=${ credentials.ApiKey }`;
@@ -8,6 +10,18 @@ const authConf = {
         "Content-Type": "application/x-www-form-urlencoded"
     }
 };
+
+function getDate() {
+    const date = new Date()
+    const day = date.getDate()
+    const month = date.getMonth() + 1
+    const year = date.getFullYear()
+    const hour = date.getHours()
+    const minute = date.getMinutes()
+    const second = date.getSeconds()
+  
+    return year + '-' + month + '-' + day + '-' + hour + '.' + minute + '.' + second +'.'
+  }
 
 module.exports.peripherals = (req,res) => {
     axios.post( authUrl, authData, authConf )
@@ -83,14 +97,25 @@ module.exports.peripheral = (req,res)=>{
 }
 
 module.exports.addPeripheral = (req,res) => {
-    var {type,brand,model,serialNumber,acceptedConditions,isInside,securityAuthorization}=req.body;
-    axios.post( authUrl, authData, authConf )
+    var {type,brand,model,serialNumber,acceptedConditions,isInside,securityAuthorization,comment}=req.body;
+    var date = getDate();
+    const userToken = req.headers["x-access-token"];
+    console.log(date);
+    jwt.verify(userToken, config.secret, (err, decoded) => {
+        var EmployeeName = "";
+        var EmployeeEmail = "";
+        var EmployeeSerial = "";
+        var EmployeeArea = decoded.area;
+        var MngrName = decoded.name;
+        var MngrEmail = decoded.id;
+        console.log(decoded)
+        axios.post( authUrl, authData, authConf )
     .then( response => {
         // Making query
         const token = response.data.access_token
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
-            "commands":`insert into device values('${type}','${brand}','${model}','${serialNumber}',${acceptedConditions},${isInside},${securityAuthorization});`,
+            "commands":`insert into device values('${type}','${brand}','${model}','${serialNumber}',${acceptedConditions},${isInside},${securityAuthorization},'${EmployeeName}','${EmployeeEmail}','${EmployeeSerial}','${EmployeeArea}','${MngrName}','${MngrEmail}','${date}','${comment}');`,
             "limit":10000,
             "separator":";",
             "stop_on_error":"yes"
@@ -108,9 +133,14 @@ module.exports.addPeripheral = (req,res) => {
             axios.get(getDataUrl,queryConf)
                 .then(response => {
                     try{
-                        //manejas informacion que pediste por el query
-                        //console.log(response.data.results[0].rows)
-                        res.json({message:"success"})//respuesta con success(json)
+                        if(response.data.results.error){
+                            res.json({message:response.data.results.error})
+                        }else{
+                            console.log(response.data.results)
+                            res.json({message:"success"})//respuesta con success(json)
+                        }
+                    
+                        
                     } catch(error){
                         console.error(error);//errorHandling
                         res.status(404).json({message:error})
@@ -118,6 +148,9 @@ module.exports.addPeripheral = (req,res) => {
                 })
         })            
     });
+    })
+
+    
 }
 
 module.exports.updatePeripheral = (req,res) => {
