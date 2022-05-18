@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/auth.controller');
-const { hasToken,verifyToken } = require('../middleware/authJwt');
+const { hasToken,verifyToken, isFocal } = require('../middleware/authJwt');
 const {authJwt} = require('../middleware/index');
 
 router.route('/login')
@@ -10,7 +10,7 @@ router.route('/login')
     );
 router.route('/signup')
     .post(
-        [hasToken,verifyToken],
+        [hasToken,verifyToken,isFocal],
         controller.signup
     )
 router.route('/hasAccess')

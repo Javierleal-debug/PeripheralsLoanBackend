@@ -81,7 +81,7 @@ module.exports.signup = (req,res) => {
             const token = response.data.access_token
             const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
             const queryData = {
-                "commands":`insert into usersdatabase values ('${userid}','${email}','${name}','${last_name}','${usertypeid}','${pwd}');`,
+                "commands":`insert into users values ('${userid}','${email}','${name}','${last_name}','${usertypeid}','${pwd}');`, //actualizar esta query
                 "limit":10,
                 "separator":";",
                 "stop_on_error":"yes"

@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 function getDate() {
     var date = new Date()
     var day = date.getDate()
@@ -15,3 +16,5 @@ function getDate() {
     return year + '-' + month + '-' + day + '-' + hour + '.' + minute + '.' + second +'.'
   }
 console.log(getDate());
+const pwd=bcrypt.hashSync("wilebaldo123",8);
+console.log(pwd)

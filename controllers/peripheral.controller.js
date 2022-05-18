@@ -107,9 +107,9 @@ module.exports.addPeripheral = (req,res) => {
     const userToken = req.headers["x-access-token"];
     console.log(date);
     jwt.verify(userToken, config.secret, (err, decoded) => {
-        var EmployeeName = "";
-        var EmployeeEmail = "";
-        var EmployeeSerial = "";
+        var EmployeeName = "Test";
+        var EmployeeEmail = "Test";
+        var EmployeeSerial = "Test";
         var EmployeeArea = decoded.area;
         var MngrName = decoded.name;
         var MngrEmail = decoded.id;
@@ -120,7 +120,7 @@ module.exports.addPeripheral = (req,res) => {
         const token = response.data.access_token
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
-            "commands":`insert into "SNT24490"."PERIPHERAL" ("TYPE","BRAND","MODEL","SERIALNUMBER","ACCEPTEDCONDITIONS","ISINSIDE","SECURITYAUTHORIZATION","EmployeeName","EmployeeEmail","EmployeeSerial","EmployeeArea","MNGRName","MNGREmail","Date","Comment")
+            "commands":`insert INTO  "SNT24490"."PERIPHERAL" ("TYPE","BRAND","MODEL","SERIALNUMBER","ACCEPTEDCONDITIONS","ISINSIDE","SECURITYAUTHORIZATION","EMPLOYEENAME","EMPLOYEEEMAIL","EMPLOYEESERIAL","EMPLOYEEAREA","MNGRNAME","MNGREMAIL","DATE","COMMENT")
              values('${type}','${brand}','${model}','${serialNumber}',${acceptedConditions},${isInside},${securityAuthorization},'${EmployeeName}','${EmployeeEmail}','${EmployeeSerial}','${EmployeeArea}','${MngrName}','${MngrEmail}','${date}','${comment}');`,
             "limit":10000,
             "separator":";",
@@ -139,10 +139,11 @@ module.exports.addPeripheral = (req,res) => {
             axios.get(getDataUrl,queryConf)
                 .then(response => {
                     try{
-                        if(response.data.results.error){
-                            res.json({message:response.data.results.error})
+                        if(response.data.results[0].error){
+                            console.log(response.data.results[0])
+                            res.json({message:response.data.results[0].error})
                         }else{
-                            console.log(response.data.results)
+                            console.log(response.data.results[0])
                             res.json({message:"success"})//respuesta con success(json)
                         }
                     
@@ -287,4 +288,8 @@ module.exports.deletePeripherals = (req,res) => {
                 })
         })            
     });
+}
+
+module.exports.peripheralsByDate = (req,res) => {
+    res.json({message:"function not done"});
 }
