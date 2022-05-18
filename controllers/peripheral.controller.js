@@ -35,7 +35,7 @@ module.exports.peripherals = (req,res) => {
         const token = response.data.access_token
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
-            "commands":`SELECT * from device where 'isvisible' is not null;`,
+            "commands":`SELECT * FROM "SNT24490"."PERIPHERAL" where "HIDDEN"=false;`,
             "limit":10000,
             "separator":";",
             "stop_on_error":"yes"
@@ -72,7 +72,7 @@ module.exports.peripheral = (req,res)=>{
         const token = response.data.access_token
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
-            "commands":`SELECT * from device WHERE serialNumber='${req.params.serialNumber}'; `,
+            "commands":`SELECT * from "SNT24490"."PERIPHERAL" WHERE serialNumber='${req.params.serialNumber}' AND "HIDDEN"=false; `,
             "separator":";",
             "stop_on_error":"yes"
         }
@@ -120,7 +120,7 @@ module.exports.addPeripheral = (req,res) => {
         const token = response.data.access_token
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
-            "commands":`insert into device ("TYPE","BRAND","MODEL","SERIALNUMBER","ACCEPTEDCONDITIONS","ISINSIDE","SECURITYAUTHORIZATION","EmployeeName","EmployeeEmail","EmployeeSerial","EmployeeArea","MNGRName","MNGREmail","Date","Comment")
+            "commands":`insert into "SNT24490"."PERIPHERAL" ("TYPE","BRAND","MODEL","SERIALNUMBER","ACCEPTEDCONDITIONS","ISINSIDE","SECURITYAUTHORIZATION","EmployeeName","EmployeeEmail","EmployeeSerial","EmployeeArea","MNGRName","MNGREmail","Date","Comment")
              values('${type}','${brand}','${model}','${serialNumber}',${acceptedConditions},${isInside},${securityAuthorization},'${EmployeeName}','${EmployeeEmail}','${EmployeeSerial}','${EmployeeArea}','${MngrName}','${MngrEmail}','${date}','${comment}');`,
             "limit":10000,
             "separator":";",
@@ -168,7 +168,7 @@ module.exports.updatePeripheral = (req,res) => {
         const token = response.data.access_token
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
-            "commands":`update device set type='${type}', brand='${brand}', model='${model}' where serialNumber='${serialNumber}';`,
+            "commands":`update "SNT24490"."PERIPHERAL" set type='${type}', brand='${brand}', model='${model}' where serialNumber='${serialNumber}';`,
             "limit":10000,
             "separator":";",
             "stop_on_error":"yes"
@@ -206,7 +206,7 @@ module.exports.deletePeripheral = (req,res) => {
         const token = response.data.access_token
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
-            "commands":`delete from device where serialNumber='${serialNumber}';`,
+            "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "HIDDEN" = true WHERE "SERIALNUMBER" ='${serialNumber}' ;`,
             "limit":10000,
             "separator":";",
             "stop_on_error":"yes"
@@ -253,7 +253,7 @@ module.exports.deletePeripherals = (req,res) => {
         const token = response.data.access_token
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
-            "commands":`delete from device where serialNumber in (${serialNumber});`,//modificar "query data" con el query SQL
+            "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "HIDDEN" = true WHERE "SERIALNUMBER" in (${serialNumber});`,//modificar "query data" con el query SQL
             "limit":10000,
             "separator":";",
             "stop_on_error":"yes"
