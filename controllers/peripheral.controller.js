@@ -12,14 +12,19 @@ const authConf = {
 };
 
 function getDate() {
-    const date = new Date()
-    const day = date.getDate()
-    const month = date.getMonth() + 1
-    const year = date.getFullYear()
-    const hour = date.getHours()
-    const minute = date.getMinutes()
-    const second = date.getSeconds()
-  
+    var date = new Date()
+    var day = date.getDate()
+    var month = date.getMonth() + 1
+    var year = date.getFullYear()
+    var hour = date.getHours()
+    var minute = date.getMinutes()
+    var second = date.getSeconds()
+    if(second < 10){
+        second = '0'+ second;
+    }
+    if(minute < 10){
+        minute = '0'+ minute;
+    }
     return year + '-' + month + '-' + day + '-' + hour + '.' + minute + '.' + second +'.'
   }
 
@@ -30,7 +35,7 @@ module.exports.peripherals = (req,res) => {
         const token = response.data.access_token
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
-            "commands":`SELECT * from device;`,
+            "commands":`SELECT * from device where 'isvisible' is not null;`,
             "limit":10000,
             "separator":";",
             "stop_on_error":"yes"
@@ -115,7 +120,8 @@ module.exports.addPeripheral = (req,res) => {
         const token = response.data.access_token
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
-            "commands":`insert into device values('${type}','${brand}','${model}','${serialNumber}',${acceptedConditions},${isInside},${securityAuthorization},'${EmployeeName}','${EmployeeEmail}','${EmployeeSerial}','${EmployeeArea}','${MngrName}','${MngrEmail}','${date}','${comment}');`,
+            "commands":`insert into device ("TYPE","BRAND","MODEL","SERIALNUMBER","ACCEPTEDCONDITIONS","ISINSIDE","SECURITYAUTHORIZATION","EmployeeName","EmployeeEmail","EmployeeSerial","EmployeeArea","MNGRName","MNGREmail","Date","Comment")
+             values('${type}','${brand}','${model}','${serialNumber}',${acceptedConditions},${isInside},${securityAuthorization},'${EmployeeName}','${EmployeeEmail}','${EmployeeSerial}','${EmployeeArea}','${MngrName}','${MngrEmail}','${date}','${comment}');`,
             "limit":10000,
             "separator":";",
             "stop_on_error":"yes"

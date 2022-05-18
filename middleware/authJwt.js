@@ -36,7 +36,7 @@ const isFocal = (req,res,next) => {//implementar funcion que revisa si el token 
                 message:"Invalid Token"
             });
         }else{
-            if(decoded.userType===1){ // el 1 significa focal user
+            if(decoded.userType==1){ // el 1 significa focal user
                 console.log("Is Focal");
                 next();
             }else{
@@ -59,7 +59,7 @@ const isSecurity = (req,res,next) => { //implementar funcion que revisa si el to
                 message:"Invalid Token"
             });
         }else{
-            if(decoded.userType===2){//el 2 significa security user
+            if(decoded.userType==2){//el 2 significa security user
                 console.log("Is Focal");
                 next();
             }else{
