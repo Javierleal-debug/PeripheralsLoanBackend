@@ -102,14 +102,11 @@ module.exports.peripheral = (req,res)=>{
 }
 
 module.exports.addPeripheral = (req,res) => {
-    var {type,brand,model,serialNumber,acceptedConditions,isInside,securityAuthorization,comment}=req.body;
+    var {type,brand,model,serialNumber,acceptedConditions,isInside,securityAuthorization,employeeName,employeeEmail,employeeSerial,comment}=req.body;
     var date = getDate();
     const userToken = req.headers["x-access-token"];
     console.log(date);
     jwt.verify(userToken, config.secret, (err, decoded) => {
-        var EmployeeName = "Test";
-        var EmployeeEmail = "Test";
-        var EmployeeSerial = "Test";
         var EmployeeArea = decoded.area;
         var MngrName = decoded.name;
         var MngrEmail = decoded.id;
@@ -121,7 +118,7 @@ module.exports.addPeripheral = (req,res) => {
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
             "commands":`insert INTO  "SNT24490"."PERIPHERAL" ("TYPE","BRAND","MODEL","SERIALNUMBER","ACCEPTEDCONDITIONS","ISINSIDE","SECURITYAUTHORIZATION","EMPLOYEENAME","EMPLOYEEEMAIL","EMPLOYEESERIAL","EMPLOYEEAREA","MNGRNAME","MNGREMAIL","DATE","COMMENT")
-             values('${type}','${brand}','${model}','${serialNumber}',${acceptedConditions},${isInside},${securityAuthorization},'${EmployeeName}','${EmployeeEmail}','${EmployeeSerial}','${EmployeeArea}','${MngrName}','${MngrEmail}','${date}','${comment}');`,
+             values('${type}','${brand}','${model}','${serialNumber}',${acceptedConditions},${isInside},${securityAuthorization},'${employeeName}','${employeeEmail}','${employeeSerial}','${EmployeeArea}','${MngrName}','${MngrEmail}','${date}','${comment}');`,
             "limit":10000,
             "separator":";",
             "stop_on_error":"yes"
