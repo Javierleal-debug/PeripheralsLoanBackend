@@ -19,7 +19,10 @@ router.route('/:serialNumber')
     .put([hasToken,verifyToken,isFocal],controller.updatePeripheral)
     .delete([hasToken,verifyToken,isFocal],controller.deletePeripheral)
 
-router.route('/:date')//YYYY-MM-DD-hh.mm.ss.
-    .get([hasToken,verifyToken],controller.peripheralsByDate)
+router.route('/insideDate')//YYYY-MM-DD
+    .post([hasToken,verifyToken],controller.peripheralsInsideByDate)
+
+router.route('/outsideDate')//YYYY-MM-DD
+    .post([hasToken,verifyToken],controller.peripheralsOutsideByDate)
 
 module.exports=router; 
