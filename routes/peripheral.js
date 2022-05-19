@@ -5,7 +5,7 @@ const credentials = require('../config/credentials.json');
 const jwt = require('jsonwebtoken');
 const config = require('../config/auth.config');
 const controller = require('../controllers/peripheral.controller');
-const { hasToken,verifyToken, isFocal } = require('../middleware/authJwt');
+const { hasToken,verifyToken, isFocal, isSecurity } = require('../middleware/authJwt');
 
 
 
@@ -24,5 +24,20 @@ router.route('/insideDate')//YYYY-MM-DD
 
 router.route('/outsideDate')//YYYY-MM-DD
     .post([hasToken,verifyToken],controller.peripheralsOutsideByDate)
+
+router.route('/request')
+    .post([hasToken,verifyToken],controller.peripheralRequest)
+
+router.route('/loan')
+    .post([hasToken,verifyToken,isFocal],controller.peripheralLoan)
+
+router.route('/reset')
+    .post([hasToken,verifyToken,isFocal],controller.peripheralReset)
+
+router.route('/return')
+    .post([hasToken,verifyToken,isFocal],controller.peripheralReturn)
+
+router.route('/securityAuthorize')
+    .post([hasToken,verifyToken,isSecurity],controller.peripheralSecurityAuthorize)
 
 module.exports=router; 

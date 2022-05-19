@@ -34,12 +34,16 @@ const authUrl = 'https://iam.cloud.ibm.com/identity/token';
             axios.get(getDataUrl,queryConf)
                 .then(response => {
                     try{
-                        //manejas informacion que pediste por el query
-                        console.log(response.data.results[0].rows)
-                        res.json({message:"success"})//respuesta con success(json)
+                        if(response.data.results[0].error){
+                            console.log(response.data.results[0])
+                            res.json({message:response.data.results[0].error})
+                        }else{
+                            console.log(response.data.results[0])
+                            res.json({message:"success"})//respuesta con success(json)
+                        }
                     } catch(error){
                         console.error(error);//errorHandling
-                        res.status(404).json({message:"User not found"})
+                        res.status(404).json({message:error})
                     }
                 })
         })            

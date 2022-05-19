@@ -146,8 +146,6 @@ module.exports.addPeripheral = (req,res) => {
                             console.log(response.data.results[0])
                             res.json({message:"success"})//respuesta con success(json)
                         }
-                    
-                        
                     } catch(error){
                         console.error(error);//errorHandling
                         res.status(404).json({message:error})
@@ -363,4 +361,241 @@ module.exports.peripheralsOutsideByDate = (req,res) => {
         })            
     });
     
+}
+
+module.exports.peripheralRequest = (req,res) => {
+    var userToken = req.headers['x-access-token'];
+    var {serialNumber} = req.body;
+    jwt.verify(userToken,config.secret, (err,decoded) => {
+        const employeeName = decoded.name;
+        const employeeEmail = decoded.email;
+        const employeeSerial = decoded.serial;
+        const employeeArea = decoded.area;
+        const mngrName = decoded.mngrName;
+        const mngrEmail = decoded.mngrEmail;
+        date = getDate();
+        
+    axios.post( authUrl, authData, authConf )
+    .then( response => {
+        // Making query
+        const token = response.data.access_token
+        const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
+        const queryData = {
+            "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "EMPLOYEENAME" = '${employeeName}',"EMPLOYEEEMAIL" = '${employeeEmail}',"EMPLOYEESERIAL" = '${employeeSerial}',"EMPLOYEEAREA" = '${employeeArea}',"MNGRNAME" = '${mngrName}',"MNGREMAIL" = '${mngrEmail}', "DATE" = '${date}'
+WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query data" con el query SQL
+            "limit":10,
+            "separator":";",
+            "stop_on_error":"yes"
+        }
+        const queryConf = {
+            headers: {
+                "authorization": `Bearer ${token}`,
+                "csontent-Type": 'application/json',
+                "x-deployment-id": credentials.DB_DEPLOYMENT_ID
+            }
+        }
+        axios.post(queryURL,queryData,queryConf)
+        .then(response => {
+            const getDataUrl = `${queryURL}/${response.data.id}`
+            axios.get(getDataUrl,queryConf)
+                .then(response => {
+                    try{
+                        if(response.data.results[0].error){
+                            console.log(response.data.results[0])
+                            res.json({message:response.data.results[0].error})
+                        }else{
+                            console.log(response.data.results[0])
+                            res.json({message:"success"})//respuesta con success(json)
+                        }
+                    } catch(error){
+                        console.error(error);//errorHandling
+                        res.status(404).json({message:error})
+                    }
+                })
+        })            
+    });
+    })
+}
+
+module.exports.peripheralLoan = (req,res) => {
+    const {serialNumber} = req.body;
+    var date = getDate();
+    axios.post( authUrl, authData, authConf )
+    .then( response => {
+        // Making query
+        const token = response.data.access_token
+        const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
+        const queryData = {
+            "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "ACCEPTEDCONDITIONS" = true,"DATE" = '${date}'
+            WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query data" con el query SQL
+            "limit":10,
+            "separator":";",
+            "stop_on_error":"yes"
+        }
+        const queryConf = {
+            headers: {
+                "authorization": `Bearer ${token}`,
+                "csontent-Type": 'application/json',
+                "x-deployment-id": credentials.DB_DEPLOYMENT_ID
+            }
+        }
+        axios.post(queryURL,queryData,queryConf)
+        .then(response => {
+            const getDataUrl = `${queryURL}/${response.data.id}`
+            axios.get(getDataUrl,queryConf)
+                .then(response => {
+                    try{
+                        if(response.data.results[0].error){
+                            console.log(response.data.results[0])
+                            res.json({message:response.data.results[0].error})
+                        }else{
+                            console.log(response.data.results[0])
+                            res.json({message:"success"})//respuesta con success(json)
+                        }
+                    } catch(error){
+                        console.error(error);//errorHandling
+                        res.status(404).json({message:error})
+                    }
+                })
+        })            
+    });
+}
+
+module.exports.peripheralReset = (req,res) => {
+    var userToken = req.headers['x-access-token'];
+    var {serialNumber} = req.body;
+    var date = getDate();
+    jwt.verify(userToken,config.secret, (err,decoded) => {
+        var mngrName = decoded.name;
+        var mngrEmail = decoded.id;
+        axios.post( authUrl, authData, authConf )
+    .then( response => {
+        // Making query
+        const token = response.data.access_token
+        const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
+        const queryData = {
+            "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "ACCEPTEDCONDITIONS" = false,"EMPLOYEENAME" = '',"EMPLOYEEEMAIL" = '',"EMPLOYEESERIAL" = '',"EMPLOYEEAREA" = '',"MNGRNAME" = '${mngrName}',"MNGREMAIL" = '${mngrEmail}', "DATE" = '${date}'
+WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query data" con el query SQL
+            "limit":10,
+            "separator":";",
+            "stop_on_error":"yes"
+        }
+        const queryConf = {
+            headers: {
+                "authorization": `Bearer ${token}`,
+                "csontent-Type": 'application/json',
+                "x-deployment-id": credentials.DB_DEPLOYMENT_ID
+            }
+        }
+        axios.post(queryURL,queryData,queryConf)
+        .then(response => {
+            const getDataUrl = `${queryURL}/${response.data.id}`
+            axios.get(getDataUrl,queryConf)
+                .then(response => {
+                    try{
+                        if(response.data.results[0].error){
+                            console.log(response.data.results[0])
+                            res.json({message:response.data.results[0].error})
+                        }else{
+                            console.log(response.data.results[0])
+                            res.json({message:"success"})//respuesta con success(json)
+                        }
+                    } catch(error){
+                        console.error(error);//errorHandling
+                        res.status(404).json({message:error})
+                    }
+                })
+        })            
+    });
+    })
+    
+}
+
+module.exports.peripheralReturn = (req,res) => {
+    var userToken = req.headers['x-access-token'];
+    var {serialNumber} = req.body;
+    var date = getDate();
+    axios.post( authUrl, authData, authConf )
+    .then( response => {
+        // Making query
+        const token = response.data.access_token
+        const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
+        const queryData = {
+            "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "ACCEPTEDCONDITIONS" = false,"EMPLOYEENAME" = '',"EMPLOYEEEMAIL" = '',"EMPLOYEESERIAL" = '',"EMPLOYEEAREA" = '',"MNGRNAME" = '${mngrName}',"MNGREMAIL" = '${mngrEmail}', "DATE" = '${date}'
+WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query data" con el query SQL
+            "limit":10,
+            "separator":";",
+            "stop_on_error":"yes"
+        }
+        const queryConf = {
+            headers: {
+                "authorization": `Bearer ${token}`,
+                "csontent-Type": 'application/json',
+                "x-deployment-id": credentials.DB_DEPLOYMENT_ID
+            }
+        }
+        axios.post(queryURL,queryData,queryConf)
+        .then(response => {
+            const getDataUrl = `${queryURL}/${response.data.id}`
+            axios.get(getDataUrl,queryConf)
+                .then(response => {
+                    try{
+                        if(response.data.results[0].error){
+                            console.log(response.data.results[0])
+                            res.json({message:response.data.results[0].error})
+                        }else{
+                            console.log(response.data.results[0])
+                            res.json({message:"success"})//respuesta con success(json)
+                        }
+                    } catch(error){
+                        console.error(error);//errorHandling
+                        res.status(404).json({message:error})
+                    }
+                })
+        })            
+    });
+}
+
+module.exports.peripheralSecurityAuthorize = (req,res) => {
+    const [serialNumber] = req.body;
+    date = getDate();
+    axios.post( authUrl, authData, authConf )
+    .then( response => {
+        // Making query
+        const token = response.data.access_token
+        const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
+        const queryData = {
+            "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "SECURITYAUTHORIZATION" = true, "DATE" = '${date}'
+WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query data" con el query SQL
+            "limit":10,
+            "separator":";",
+            "stop_on_error":"yes"
+        }
+        const queryConf = {
+            headers: {
+                "authorization": `Bearer ${token}`,
+                "csontent-Type": 'application/json',
+                "x-deployment-id": credentials.DB_DEPLOYMENT_ID
+            }
+        }
+        axios.post(queryURL,queryData,queryConf)
+        .then(response => {
+            const getDataUrl = `${queryURL}/${response.data.id}`
+            axios.get(getDataUrl,queryConf)
+                .then(response => {
+                    try{
+                        if(response.data.results[0].error){
+                            console.log(response.data.results[0])
+                            res.json({message:response.data.results[0].error})
+                        }else{
+                            console.log(response.data.results[0])
+                            res.json({message:"success"})//respuesta con success(json)
+                        }
+                    } catch(error){
+                        console.error(error);//errorHandling
+                        res.status(404).json({message:error})
+                    }
+                })
+        })            
+    });
 }
