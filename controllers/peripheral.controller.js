@@ -567,7 +567,7 @@ module.exports.peripheralSecurityAuthorize = (req,res) => {
         const token = response.data.access_token
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
-            "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "SECURITYAUTHORIZATION" = true, "DATE" = '${date}'
+            "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "SECURITYAUTHORIZATION" = true,"ISINSIDE"=false, "DATE" = '${date}'
 WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query data" con el query SQL
             "limit":10,
             "separator":";",
