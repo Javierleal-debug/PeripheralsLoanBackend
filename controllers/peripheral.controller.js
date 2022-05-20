@@ -512,45 +512,50 @@ module.exports.peripheralReturn = (req,res) => {
     var userToken = req.headers['x-access-token'];
     var {serialNumber} = req.body;
     var date = getDate();
-    axios.post( authUrl, authData, authConf )
-    .then( response => {
-        // Making query
-        const token = response.data.access_token
-        const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
-        const queryData = {
-            "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "ACCEPTEDCONDITIONS" = false,"ISINSIDE"=true,"SECURITYAUTHORIZATION"=false,"EMPLOYEENAME" = '',"EMPLOYEEEMAIL" = '',"EMPLOYEESERIAL" = '',"EMPLOYEEAREA" = '',"MNGRNAME" = '${mngrName}',"MNGREMAIL" = '${mngrEmail}', "DATE" = '${date}'
-WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query data" con el query SQL
-            "limit":10,
-            "separator":";",
-            "stop_on_error":"yes"
-        }
-        const queryConf = {
-            headers: {
-                "authorization": `Bearer ${token}`,
-                "csontent-Type": 'application/json',
-                "x-deployment-id": credentials.DB_DEPLOYMENT_ID
+    jwt.verify(userToken,config.secret, (err,decoded) => {
+        const mngrName = decoded.mngrName;
+        const mngrEmail = decoded.mngrEmail;
+        
+        axios.post( authUrl, authData, authConf )
+        .then( response => {
+            // Making query
+            const token = response.data.access_token
+            const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
+            const queryData = {
+                "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "ACCEPTEDCONDITIONS" = false,"ISINSIDE"=true,"SECURITYAUTHORIZATION"=false,"EMPLOYEENAME" = '',"EMPLOYEEEMAIL" = '',"EMPLOYEESERIAL" = '',"EMPLOYEEAREA" = '',"MNGRNAME" = '${mngrName}',"MNGREMAIL" = '${mngrEmail}', "DATE" = '${date}'
+    WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query data" con el query SQL
+                "limit":10,
+                "separator":";",
+                "stop_on_error":"yes"
             }
-        }
-        axios.post(queryURL,queryData,queryConf)
-        .then(response => {
-            const getDataUrl = `${queryURL}/${response.data.id}`
-            axios.get(getDataUrl,queryConf)
-                .then(response => {
-                    try{
-                        if(response.data.results[0].error){
-                            console.log(response.data.results[0])
-                            res.json({message:response.data.results[0].error})
-                        }else{
-                            console.log(response.data.results[0])
-                            res.json({message:"success"})//respuesta con success(json)
+            const queryConf = {
+                headers: {
+                    "authorization": `Bearer ${token}`,
+                    "csontent-Type": 'application/json',
+                    "x-deployment-id": credentials.DB_DEPLOYMENT_ID
+                }
+            }
+            axios.post(queryURL,queryData,queryConf)
+            .then(response => {
+                const getDataUrl = `${queryURL}/${response.data.id}`
+                axios.get(getDataUrl,queryConf)
+                    .then(response => {
+                        try{
+                            if(response.data.results[0].error){
+                                console.log(response.data.results[0])
+                                res.json({message:response.data.results[0].error})
+                            }else{
+                                console.log(response.data.results[0])
+                                res.json({message:"success"})//respuesta con success(json)
+                            }
+                        } catch(error){
+                            console.error(error);//errorHandling
+                            res.status(404).json({message:error})
                         }
-                    } catch(error){
-                        console.error(error);//errorHandling
-                        res.status(404).json({message:error})
-                    }
-                })
-        })            
-    });
+                    })
+            })            
+        });
+    })
 }
 
 module.exports.peripheralSecurityAuthorize = (req,res) => {
