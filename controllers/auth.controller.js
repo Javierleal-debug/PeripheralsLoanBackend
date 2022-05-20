@@ -41,7 +41,7 @@ module.exports.signin = (req,res)=>{
                         try{
                             var userData=response.data.results[0].rows[0];
                             var passwordIsValid = bcrypt.compareSync(
-                                req.body.pwd,
+                                pwd,
                                 response.data.results[0].rows[0][6]
                             );
                     
