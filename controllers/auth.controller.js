@@ -69,19 +69,21 @@ module.exports.signin = (req,res)=>{
 
 module.exports.signup = (req,res) => {
     let mngrtoken = req.headers["x-access-token"];
-    const userid=req.body.userid;
-    const email=req.body.email;
-    const name=req.body.name;
-    const last_name=req.body.last_name;
-    const usertypeid=req.body.usertypeid;
-    const pwd=bcrypt.hashSync(req.body.pwd,8);
+    const name = req.body.name;
+    const email = req.body.email;
+    const serial = req.body.serial;
+    const area = req.body.area;
+    const mngrName = req.body.mngrName;
+    const mngrEmail = req.body.mngrEmail;
+    const pwd = bcrypt.hashSync(req.body.pwd,8);
+    const userType = req.body.userType;
     axios.post( authUrl, authData, authConf )
         .then( response => {
             // Making query
             const token = response.data.access_token
             const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
             const queryData = {
-                "commands":`insert into users values ('${userid}','${email}','${name}','${last_name}','${usertypeid}','${pwd}');`, //actualizar esta query
+                "commands":`insert into users values ('${name}','${email}','${serial}','${area}','${mngrName}','${mngrEmail}','${pwd}','${userType}');`, //actualizar esta query
                 "limit":10,
                 "separator":";",
                 "stop_on_error":"yes"

@@ -13,8 +13,10 @@ function getDate() {
     if(minute < 10){
         minute = '0'+ minute;
     }
-    return year + '-' + month + '-' + day + '-' + hour + '.' + minute + '.' + second +'.'
+    return year + '-' + month + '-' + day
   }
-console.log(getDate());
+var date=getDate();
+console.log(date.length);
+console.log(date);
 const pwd=bcrypt.hashSync("wilebaldo123",8);
 console.log(pwd)

@@ -66,13 +66,17 @@ module.exports.peripherals = (req,res) => {
 }
 
 module.exports.peripheral = (req,res)=>{
+    const {serialNumber} = req.params;
+    if(serialNumber.length > 100){
+        res.json({message:"Invalid peripheral serialNumber length(max 100)"})
+    }
     axios.post( authUrl, authData, authConf )
     .then( response => {
         // Making query
         const token = response.data.access_token
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
-            "commands":`SELECT * from "SNT24490"."PERIPHERAL" WHERE serialNumber='${req.params.serialNumber}' AND "HIDDEN"=false; `,
+            "commands":`SELECT * from "SNT24490"."PERIPHERAL" WHERE serialNumber='${serialNumber}' AND "HIDDEN"=false; `,
             "separator":";",
             "stop_on_error":"yes"
         }
@@ -157,6 +161,9 @@ module.exports.addPeripheral = (req,res) => {
 
 module.exports.updatePeripheral = (req,res) => {
     const {serialNumber} = req.params;
+    if(serialNumber.length > 100){
+        res.json({message:"Invalid peripheral serialNumber length(max 100)"})
+    }
     const {type,brand,model} = req.body;
     axios.post( authUrl, authData, authConf )
     .then( response => {
@@ -196,6 +203,9 @@ module.exports.updatePeripheral = (req,res) => {
 
 module.exports.deletePeripheral = (req,res) => {
     const {serialNumber} = req.params;
+    if(serialNumber.length > 100){
+        res.json({message:"Invalid peripheral serialNumber length(max 100)"})
+    }
     axios.post( authUrl, authData, authConf )
     .then( response => {
         // Making query
@@ -287,6 +297,9 @@ module.exports.deletePeripherals = (req,res) => {
 
 module.exports.peripheralsInsideByDate = (req,res) => {
     const {date} = req.body; //formato YYYY-MM-DD
+    if (date.length > 10) {
+        res.json({message:"Invalid date length(max 10)"});
+    }
     axios.post( authUrl, authData, authConf )
     .then( response => {
         // Making query
@@ -324,6 +337,9 @@ module.exports.peripheralsInsideByDate = (req,res) => {
 
 module.exports.peripheralsOutsideByDate = (req,res) => {
     const {date} = req.body; //formato YYYY-MM-DD
+    if (date.length > 10) {
+        res.json({message:"Invalid date length(max 10)"});
+    }
     axios.post( authUrl, authData, authConf )
     .then( response => {
         // Making query
