@@ -88,7 +88,7 @@ module.exports.signup = (req,res) => {
             const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
             const queryData = {
                 "commands":`INSERT
-                INTO  "SNT24490"."USERS" ("NAME","EMAIL","SERIAL","AREA","MNGRNAME","MNGREMAIL","Password","USERTYPE")
+                INTO  "SNT24490"."USERS" ("NAME","EMAIL","SERIAL","AREA","MNGRNAME","MNGREMAIL","PASSWORD","USERTYPE")
                 VALUES('${employeeName}', '${employeeEmail}', '${employeeSerial}', '${employeeArea}', '${mngrName}', '${mngrEmail}', '${pwd}', ${usertypeid});`, //actualizar esta query
                 "limit":10,
                 "separator":";",
