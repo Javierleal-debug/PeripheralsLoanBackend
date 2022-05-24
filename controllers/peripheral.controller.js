@@ -381,7 +381,7 @@ module.exports.peripheralRequest = (req,res) => {
     var {serialNumber} = req.body;
     jwt.verify(userToken,config.secret, (err,decoded) => {
         const employeeName = decoded.name;
-        const employeeEmail = decoded.email;
+        const employeeEmail = decoded.id;
         const employeeSerial = decoded.serial;
         const employeeArea = decoded.area;
         const mngrName = decoded.mngrName;
