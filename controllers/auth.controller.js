@@ -76,7 +76,6 @@ module.exports.signup = (req,res) => {
     const mngrEmail = req.body.mngrEmail;
     const pwd=bcrypt.hashSync(req.body.pwd,8);
     const usertypeid=req.body.userTypeId;
-    console.log(usertypeid);
 
     var adminToken = req.headers['x-access-token'];
     jwt.verify(adminToken,config.secret, (err,decoded) => {
