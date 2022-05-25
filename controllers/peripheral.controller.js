@@ -295,85 +295,53 @@ module.exports.deletePeripherals = (req,res) => {
     });
 }
 
-module.exports.peripheralsInsideByDate = (req,res) => {
+module.exports.peripheralsInAndOutByDate = (req,res) => {
     const {date} = req.body; //formato YYYY-MM-DD
-    if (date.length > 10) {
-        res.json({message:"Invalid date length(max 10)"});
-    }
-    axios.post( authUrl, authData, authConf )
-    .then( response => {
-        // Making query
-        const token = response.data.access_token
-        const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
-        const queryData = {
-            "commands":`SELECT COUNT "DATE"  FROM "SNT24490"."PERIPHERAL" WHERE "DATE" LIKE '${date}%' and "ISINSIDE"=true and "HIDDEN"=false;`,//modificar "query data" con el query SQL
-            "limit":10,
-            "separator":";",
-            "stop_on_error":"yes"
-        }
-        const queryConf = {
-            headers: {
-                "authorization": `Bearer ${token}`,
-                "csontent-Type": 'application/json',
-                "x-deployment-id": credentials.DB_DEPLOYMENT_ID
-            }
-        }
-        axios.post(queryURL,queryData,queryConf)
-        .then(response => {
-            const getDataUrl = `${queryURL}/${response.data.id}`
-            axios.get(getDataUrl,queryConf)
-                .then(response => {
-                    try{
-                        console.log(response.data.results[0].rows[0])
-                        res.json({"value":response.data.results[0].rows[0][0]})
-                    } catch(error){
-                        console.error(error);
-                        res.json({"results":"error"})
-                    }
-                })
-        })            
-    });
-}
-
-module.exports.peripheralsOutsideByDate = (req,res) => {
-    const {date} = req.body; //formato YYYY-MM-DD
-    if (date.length > 10) {
-        res.json({message:"Invalid date length(max 10)"});
-    }
-    axios.post( authUrl, authData, authConf )
-    .then( response => {
-        // Making query
-        const token = response.data.access_token
-        const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
-        const queryData = {
-            "commands":`SELECT COUNT "DATE"  FROM "SNT24490"."PERIPHERAL" WHERE "DATE" LIKE '${date}%' and "ISINSIDE"=false and "HIDDEN"=false;`,//modificar "query data" con el query SQL
-            "limit":10,
-            "separator":";",
-            "stop_on_error":"yes"
-        }
-        const queryConf = {
-            headers: {
-                "authorization": `Bearer ${token}`,
-                "csontent-Type": 'application/json',
-                "x-deployment-id": credentials.DB_DEPLOYMENT_ID
-            }
-        }
-        axios.post(queryURL,queryData,queryConf)
-        .then(response => {
-            const getDataUrl = `${queryURL}/${response.data.id}`
-            axios.get(getDataUrl,queryConf)
-                .then(response => {
-                    try{
-                        console.log(response.data.results[0].rows[0])
-                        res.json({"value":response.data.results[0].rows[0][0]})
-                    } catch(error){
-                        console.error(error);
-                        res.json({"results":"error"})
-                    }
-                })
-        })            
-    });
     
+    if (date.length > 10) {
+        console.log('inside');
+        console.log(date);
+        return res.json({message:"Invalid date length(max 10)"});
+    }
+    axios.post( authUrl, authData, authConf )
+    .then( response => {
+        // Making query
+        const token = response.data.access_token
+        const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
+        const queryData = {
+            "commands":`SELECT COUNT "DATE"  FROM "SNT24490"."PERIPHERAL" WHERE "DATE" LIKE '${date}%' and "ISINSIDE"=true and "HIDDEN"=false; SELECT COUNT "DATE"  FROM "SNT24490"."PERIPHERAL" WHERE "DATE" LIKE '${date}%' and "ISINSIDE"=false and "HIDDEN"=false;`,//modificar "query data" con el query SQL
+            "limit":10,
+            "separator":";",
+            "stop_on_error":"no"
+        }
+        const queryConf = {
+            headers: {
+                "authorization": `Bearer ${token}`,
+                "csontent-Type": 'application/json',
+                "x-deployment-id": credentials.DB_DEPLOYMENT_ID
+            }
+        }
+        axios.post(queryURL,queryData,queryConf)
+        .then(response => {
+            const getDataUrl = `${queryURL}/${response.data.id}`
+            axios.get(getDataUrl,queryConf)
+                .then(response => {
+                    try{
+                        if(response.data.results[0].error){
+                            console.log(date);
+                            console.log(response.data.results[0])
+                            res.json({"message":response.data.results[0].error})
+                        }else{
+                            console.log(response.data.results)
+                            res.json({"valueIn":response.data.results[0].rows[0][0],"valueOut":response.data.results[1].rows[0][0]})//respuesta con success(json)
+                        }
+                    } catch(error){
+                        console.error(error);
+                        res.json({"results":"error"})
+                    }
+                })
+        })
+    });
 }
 
 module.exports.peripheralRequest = (req,res) => {

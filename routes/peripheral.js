@@ -20,11 +20,8 @@ router.route('/:serialNumber')
     .put([hasToken,verifyToken,isFocal,verifyPeripheralBodyMaxLength],controller.updatePeripheral)
     .delete([hasToken,verifyToken,isFocal],controller.deletePeripheral)
 
-router.route('/insideDate')//YYYY-MM-DD  
-    .post([hasToken,verifyToken],controller.peripheralsInsideByDate) //solo usa un parametro del body(la verificacion está dentro de la funcion)
-
-router.route('/outsideDate')//YYYY-MM-DD
-    .post([hasToken,verifyToken],controller.peripheralsOutsideByDate) //solo usa un parametro del body(la verificacion está dentro de la funcion)
+router.route('/inOutDate')//YYYY-MM-DD  
+    .post([hasToken,verifyToken],controller.peripheralsInAndOutByDate) //solo usa un parametro del body(la verificacion está dentro de la funcion)
 
 router.route('/request')
     .post([hasToken,verifyToken,verifyPeripheralBodyMaxLength],controller.peripheralRequest)
