@@ -13,8 +13,17 @@ const authUrl = 'https://iam.cloud.ibm.com/identity/token';
     };
 
 module.exports.signin = (req,res)=>{
-    const email=req.body.email;
-    const pwd=req.body.pwd;
+    const {email,pwd} = req.body;
+    try{
+        if(email.length<0 || pwd.length<0){
+            return res.json({message:"email and/or password not provided"})
+        }
+    }catch(e){
+        return res.json({message:"email and/or password not provided"})
+    }
+    
+    
+    
     axios.post( authUrl, authData, authConf )
         .then( response => {
             // Making query
