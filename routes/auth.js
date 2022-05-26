@@ -17,4 +17,9 @@ router.route('/hasAccess')
     .get([hasToken,verifyToken],
         controller.hasAccess)
 
+router.route('/userType')
+    .get(
+        [hasToken,verifyToken],controller.usertype
+    )
+
 module.exports = router;

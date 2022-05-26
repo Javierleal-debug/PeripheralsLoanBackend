@@ -130,3 +130,10 @@ module.exports.signup = (req,res) => {
 module.exports.hasAccess = (req,res) => {
     res.json({"access":true});
 }
+
+module.exports.usertype = (req,res) => {
+    const userToken = req.headers['x-access-token'];
+    jwt.verify(userToken,config.secret, (err,decoded) => {
+        res.json({"value":decoded.userType});
+    })
+}
