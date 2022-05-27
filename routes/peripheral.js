@@ -38,4 +38,7 @@ router.route('/return')
 router.route('/securityAuthorize')
     .post([hasToken,verifyToken,isSecurity,verifyPeripheralBodyMaxLength],controller.peripheralSecurityAuthorize)
 
+router.route('/byEmail')
+    .post([hasToken,verifyToken],controller.peripheralsByEmail)
+
 module.exports=router; 
