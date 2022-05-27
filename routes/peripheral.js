@@ -17,7 +17,6 @@ router.route('/')
 
 router.route('/:serialNumber')
     .get([hasToken,verifyToken],controller.peripheral)
-    .put([hasToken,verifyToken,isFocal,verifyPeripheralBodyMaxLength],controller.updatePeripheral)
     .delete([hasToken,verifyToken,isFocal],controller.deletePeripheral)
 
 router.route('/inOutDate')//YYYY-MM-DD  

@@ -60,10 +60,10 @@ const isSecurity = (req,res,next) => { //implementar funcion que revisa si el to
             });
         }else{
             if(decoded.userType==2){//el 2 significa security user
-                console.log("Is Focal");
+                console.log("Is Security");
                 next();
             }else{
-                console.log("Focal User Required")
+                console.log("Security User Required")
                 return res.status(403).send({
                     message:"User Can't Use This Function"
                 });

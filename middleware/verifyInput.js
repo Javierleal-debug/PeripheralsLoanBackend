@@ -49,15 +49,15 @@ const verifyUserBodyMaxLength = (req,res,next) => {
     mngrEmail+=req.body.mngrEmail;
     if(req.body.name > 60) {
         return res.json({message:"Invalid User Name length(max 60)"})
-    } else if(req.body.email.length > 254) {
+    } else if(email.length > 254) {
         return res.json({message:"Invalid User Email length(max 254)"})
-    } else if(req.body.serial.length > 100) {
+    } else if(serial.length > 100) {
         return res.json({message:"Invalid User Serial length(max 100)"})
-    } else if(req.body.area.length > 50) {
+    } else if(area.length > 50) {
         return res.json({message:"Invalid User Area length(max 50)"})
-    } else if(req.body.mngrName.length > 60) {
+    } else if(mngrName.length > 60) {
         return res.json({message:"Invalid Manager Name length(max 60)"})
-    } else if(req.body.mngrEmail.length > 254) {
+    } else if(mngrEmail.length > 254) {
         return res.json({message:"Invalid Manager Email length(max 254)"})
     } else {
         next();

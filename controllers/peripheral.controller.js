@@ -173,48 +173,6 @@ module.exports.addPeripheral = (req,res) => {
     
 }
 
-module.exports.updatePeripheral = (req,res) => {
-    const {serialNumber} = req.params;
-    if(serialNumber.length > 100){
-        res.json({message:"Invalid peripheral serialNumber length(max 100)"})
-    }
-    const {type,brand,model} = req.body;
-    axios.post( authUrl, authData, authConf )
-    .then( response => {
-        // Making query
-        const token = response.data.access_token
-        const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
-        const queryData = {
-            "commands":`update "SNT24490"."PERIPHERAL" set type='${type}', brand='${brand}', model='${model}' where serialNumber='${serialNumber}';`,
-            "limit":10000,
-            "separator":";",
-            "stop_on_error":"yes"
-        }
-        const queryConf = {
-            headers: {
-                "authorization": `Bearer ${token}`,
-                "csontent-Type": 'application/json',
-                "x-deployment-id": credentials.DB_DEPLOYMENT_ID
-            }
-        }
-        axios.post(queryURL,queryData,queryConf)
-        .then(response => {
-            const getDataUrl = `${queryURL}/${response.data.id}`
-            axios.get(getDataUrl,queryConf)
-                .then(response => {
-                    try{
-                        //manejas informacion que pediste por el query
-                        console.log(response.data.results[0])
-                        res.json({message:"success"})//respuesta con success(json)
-                    } catch(error){
-                        console.error(error);//errorHandling
-                        res.status(404).json({message:"User not found"})
-                    }
-                })
-        })            
-    });
-}
-
 module.exports.deletePeripheral = (req,res) => {
     const {serialNumber} = req.params;
     if(serialNumber.length > 100){
@@ -557,7 +515,7 @@ module.exports.peripheralReturn = (req,res) => {
 }
 
 module.exports.peripheralSecurityAuthorize = (req,res) => {
-    const [serialNumber] = req.body;
+    const {serialNumber} = req.body;
     date = getDate();
     axios.post( authUrl, authData, authConf )
     .then( response => {
@@ -604,13 +562,14 @@ module.exports.peripheralsByEmail = (req,res) => {
     const userToken = req.headers['x-access-token'];
     jwt.verify(userToken,config.secret,(err,decoded) => {
         const email = decoded.id
+        //console.log(email)
         axios.post( authUrl, authData, authConf )
         .then( response => {
             // Making query
             const token = response.data.access_token
             const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
             const queryData = {
-                "commands":`SELECT * FROM "SNT24490"."PERIPHERAL" where "HIDDEN"=false and "EMPLOYEEEMAIL"=${email};`,
+                "commands":`SELECT * FROM "SNT24490"."PERIPHERAL" where "HIDDEN"=false and "EMPLOYEEEMAIL"='${email}';`,
                 "limit":10000,
                 "separator":";",
                 "stop_on_error":"yes"
@@ -629,7 +588,7 @@ module.exports.peripheralsByEmail = (req,res) => {
                 axios.get(getDataUrl,queryConf)
                     .then(response => {
                         try{
-                            //console.log(response.data.results[0].rows)
+                            //console.log(response.data.results[0])
                             let devices = [{}]
                             for(let i = 0; i < response.data.results[0].rows_count; i++){
                                 var newRow = {
