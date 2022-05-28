@@ -29,6 +29,7 @@ function getDate() {
   }
 
 module.exports.peripherals = (req,res) => {
+    
     axios.post( authUrl, authData, authConf )
     .then( response => {
         // Making query
@@ -119,8 +120,10 @@ module.exports.peripheral = (req,res)=>{
     });
 }
 
-module.exports.addPeripheral = (req,res) => {
+module.exports.addPeripheral = (req,res,next) => {
+    req.body.action="ADD PERIPHERAL";
     var {type,brand,model,serialNumber,acceptedConditions,isInside,securityAuthorization,employeeName,employeeEmail,employeeSerial,comment}=req.body;
+    employeeName,employeeEmail,employeeSerial+='';
     var date = getDate();
     const userToken = req.headers["x-access-token"];
     console.log(date);
@@ -156,14 +159,15 @@ module.exports.addPeripheral = (req,res) => {
                     try{
                         if(response.data.results[0].error){
                             console.log(response.data.results[0])
-                            res.json({message:response.data.results[0].error})
+                            return res.json({message:response.data.results[0].error})
                         }else{
                             console.log(response.data.results[0])
                             res.json({message:"success"})//respuesta con success(json)
+                            next();
                         }
                     } catch(error){
                         console.error(error);//errorHandling
-                        res.status(404).json({message:error})
+                        return res.status(404).json({message:error})
                     }
                 })
         })            
@@ -208,12 +212,12 @@ module.exports.deletePeripheral = (req,res) => {
                             res.json({message:"success"})//respuesta con success(json)
                         }else{
                             console.log(response.data/*.results[0]*/)
-                            res.json({message:response.data.results[0].warning})//respuesta con success(json)
+                            return res.json({message:response.data.results[0].warning})//respuesta con success(json)
                         }
                         
                     } catch(error){
                         console.error(error);//errorHandling
-                        res.status(404).json({message:"User not found"})
+                        return res.status(404).json({message:"User not found"})
                     }
                 })
         })            
@@ -281,7 +285,7 @@ module.exports.peripheralsInAndOutByDate = (req,res) => {
         const token = response.data.access_token
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
-            "commands":`SELECT COUNT "DATE"  FROM "SNT24490"."PERIPHERAL" WHERE "DATE" LIKE '${date}%' and "ISINSIDE"=true and "HIDDEN"=false; SELECT COUNT "DATE"  FROM "SNT24490"."PERIPHERAL" WHERE "DATE" LIKE '${date}%' and "ISINSIDE"=false and "HIDDEN"=false;`,//modificar "query data" con el query SQL
+            "commands":`SELECT COUNT "DATE"  FROM "SNT24490"."PERIPHERAL" WHERE "DATE" BETWEEN '2022-01-01' AND '${date} 23:59:59' and "ISINSIDE"=true and "HIDDEN"=false; SELECT COUNT "DATE"  FROM "SNT24490"."PERIPHERAL" WHERE "DATE" BETWEEN '2022-01-01' AND '${date} 23:59:59' and "ISINSIDE"=false and "HIDDEN"=false;`,//modificar "query data" con el query SQL
             "limit":10,
             "separator":";",
             "stop_on_error":"no"
