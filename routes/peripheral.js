@@ -6,14 +6,14 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/auth.config');
 const controller = require('../controllers/peripheral.controller');
 const { hasToken,verifyToken, isFocal, isSecurity } = require('../middleware/authJwt');
-const { verifyPeripheralBodyMaxLength } = require('../middleware/verifyInput');
+const { verifyPeripheralBodyMaxLength,verifySerialNumberNotDuplicated } = require('../middleware/verifyInput');
 const record = require('../middleware/createRecord');
 
 
 
 router.route('/')
     .get([hasToken,verifyToken],controller.peripherals)
-    .post([hasToken,verifyToken,isFocal,verifyPeripheralBodyMaxLength,controller.addPeripheral,record.recordGetInfo],record.createRecord)
+    .post([hasToken,verifyToken,isFocal,verifyPeripheralBodyMaxLength,verifySerialNumberNotDuplicated,controller.addPeripheral,record.recordGetInfo],record.createRecord)
     //.delete([hasToken,verifyToken,isFocal],controller.deletePeripherals)
 
 router.route('/:serialNumber')
