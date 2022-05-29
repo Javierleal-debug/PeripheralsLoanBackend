@@ -177,7 +177,8 @@ module.exports.addPeripheral = (req,res,next) => {
     
 }
 
-module.exports.deletePeripheral = (req,res) => {
+module.exports.deletePeripheral = (req,res,next) => {
+    req.body.action="DELETE PERIPHERAL";
     const {serialNumber} = req.params;
     if(serialNumber.length > 100){
         res.json({message:"Invalid peripheral serialNumber length(max 100)"})
@@ -210,6 +211,7 @@ module.exports.deletePeripheral = (req,res) => {
                         if(!response.data.results[0].warning){
                             console.log(response.data/*.results[0]*/)
                             res.json({message:"success"})//respuesta con success(json)
+                            next();
                         }else{
                             console.log(response.data/*.results[0]*/)
                             return res.json({message:response.data.results[0].warning})//respuesta con success(json)
@@ -374,7 +376,8 @@ WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query
     })
 }
 
-module.exports.peripheralLoan = (req,res) => {
+module.exports.peripheralLoan = (req,res,next) => {
+    req.body.action="LOAN PERIPHERAL";
     const {serialNumber} = req.body;
     var date = getDate();
     axios.post( authUrl, authData, authConf )
@@ -404,21 +407,23 @@ module.exports.peripheralLoan = (req,res) => {
                     try{
                         if(response.data.results[0].error){
                             console.log(response.data.results[0])
-                            res.json({message:response.data.results[0].error})
+                            return res.json({message:response.data.results[0].error})
                         }else{
                             console.log(response.data.results[0])
                             res.json({message:"success"})//respuesta con success(json)
+                            next();
                         }
                     } catch(error){
                         console.error(error);//errorHandling
-                        res.status(404).json({message:error})
+                        return res.status(404).json({message:error})
                     }
                 })
         })            
     });
 }
 
-module.exports.peripheralReset = (req,res) => {
+module.exports.peripheralReset = (req,res,next) => {
+    req.body.action="RESET PERIPHERAL"
     var userToken = req.headers['x-access-token'];
     var {serialNumber} = req.body;
     var date = getDate();
@@ -452,14 +457,15 @@ WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query
                     try{
                         if(response.data.results[0].error){
                             console.log(response.data.results[0])
-                            res.json({message:response.data.results[0].error})
+                            return res.json({message:response.data.results[0].error})
                         }else{
                             console.log(response.data.results[0])
                             res.json({message:"success"})//respuesta con success(json)
+                            next();
                         }
                     } catch(error){
                         console.error(error);//errorHandling
-                        res.status(404).json({message:error})
+                        return res.status(404).json({message:error})
                     }
                 })
         })            
@@ -468,7 +474,8 @@ WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query
     
 }
 
-module.exports.peripheralReturn = (req,res) => {
+module.exports.peripheralReturn = (req,res,next) => {
+    req.body.action="RETURN PERIPHERAL";
     var userToken = req.headers['x-access-token'];
     var {serialNumber} = req.body;
     var date = getDate();
@@ -503,14 +510,15 @@ module.exports.peripheralReturn = (req,res) => {
                         try{
                             if(response.data.results[0].error){
                                 console.log(response.data.results[0])
-                                res.json({message:response.data.results[0].error})
+                                return res.json({message:response.data.results[0].error})
                             }else{
                                 console.log(response.data.results[0])
                                 res.json({message:"success"})//respuesta con success(json)
+                                next();
                             }
                         } catch(error){
                             console.error(error);//errorHandling
-                            res.status(404).json({message:error})
+                            return res.status(404).json({message:error})
                         }
                     })
             })            
@@ -518,7 +526,8 @@ module.exports.peripheralReturn = (req,res) => {
     })
 }
 
-module.exports.peripheralSecurityAuthorize = (req,res) => {
+module.exports.peripheralSecurityAuthorize = (req,res,next) => {
+    req.body.actions="SECURITY AUTHORIZE PERIPHERAL"
     const {serialNumber} = req.body;
     date = getDate();
     axios.post( authUrl, authData, authConf )
@@ -548,14 +557,15 @@ WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query
                     try{
                         if(response.data.results[0].error){
                             console.log(response.data.results[0])
-                            res.json({message:response.data.results[0].error})
+                            return res.json({message:response.data.results[0].error})
                         }else{
                             console.log(response.data.results[0])
                             res.json({message:"success"})//respuesta con success(json)
+                            next();
                         }
                     } catch(error){
                         console.error(error);//errorHandling
-                        res.status(404).json({message:error})
+                        return res.status(404).json({message:error})
                     }
                 })
         })            
