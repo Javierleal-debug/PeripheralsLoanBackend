@@ -20,7 +20,7 @@ router.route('/inOutDate')//YYYY-MM-DD
     .post([hasToken,verifyToken],controller.peripheralsInAndOutByDate) //solo usa un parametro del body(la verificacion está dentro de la funcion)
 
 router.route('/inOutDateData')
-    .post([hasToken,verifyToken],controller.peripheralsInAndOutByDateData)
+    .post([hasToken,verifyToken,isFocal],controller.peripheralsInAndOutByDateData)
 
 router.route('/request')
     .post([hasToken,verifyToken,verifyPeripheralBodyMaxLength],controller.peripheralRequest)
