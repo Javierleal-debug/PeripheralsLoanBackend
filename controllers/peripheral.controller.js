@@ -237,7 +237,7 @@ module.exports.deletePeripherals = (req,res) => {
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
             "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "HIDDEN" = true WHERE "SERIALNUMBER" in (${serialNumber});`,//modificar "query data" con el query SQL
-            "limit":10000,
+            "limit":1000000,
             "separator":";",
             "stop_on_error":"yes"
         }
@@ -287,7 +287,7 @@ module.exports.peripheralsInAndOutByDate = (req,res) => {
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
             "commands":`SELECT COUNT "DATE"  FROM "SNT24490"."PERIPHERAL" WHERE "DATE" BETWEEN '2022-01-01' AND '${date} 23:59:59' and "ISINSIDE"=true and "HIDDEN"=false; SELECT COUNT "DATE"  FROM "SNT24490"."PERIPHERAL" WHERE "DATE" BETWEEN '2022-01-01' AND '${date} 23:59:59' and "ISINSIDE"=false and "HIDDEN"=false;`,//modificar "query data" con el query SQL
-            "limit":10,
+            "limit":1000000,
             "separator":";",
             "stop_on_error":"no"
         }
@@ -341,7 +341,7 @@ module.exports.peripheralRequest = (req,res) => {
         const queryData = {
             "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "EMPLOYEENAME" = '${employeeName}',"EMPLOYEEEMAIL" = '${employeeEmail}',"EMPLOYEESERIAL" = '${employeeSerial}',"EMPLOYEEAREA" = '${employeeArea}',"MNGRNAME" = '${mngrName}',"MNGREMAIL" = '${mngrEmail}', "DATE" = '${date}'
 WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query data" con el query SQL
-            "limit":10,
+            "limit":10000000,
             "separator":";",
             "stop_on_error":"yes"
         }
@@ -387,7 +387,7 @@ module.exports.peripheralLoan = (req,res,next) => {
         const queryData = {
             "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "ACCEPTEDCONDITIONS" = true,"DATE" = '${date}'
             WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query data" con el query SQL
-            "limit":10,
+            "limit":100000,
             "separator":";",
             "stop_on_error":"yes"
         }
@@ -437,7 +437,7 @@ module.exports.peripheralReset = (req,res,next) => {
         const queryData = {
             "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "ACCEPTEDCONDITIONS" = false,"ISINSIDE"=true,"SECURITYAUTHORIZATION"=false,"EMPLOYEENAME" = '',"EMPLOYEEEMAIL" = '',"EMPLOYEESERIAL" = '',"EMPLOYEEAREA" = '',"MNGRNAME" = '${mngrName}',"MNGREMAIL" = '${mngrEmail}', "DATE" = '${date}'
 WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query data" con el query SQL
-            "limit":10,
+            "limit":100000,
             "separator":";",
             "stop_on_error":"yes"
         }
@@ -490,7 +490,7 @@ module.exports.peripheralReturn = (req,res,next) => {
             const queryData = {
                 "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "ACCEPTEDCONDITIONS" = false,"ISINSIDE"=true,"SECURITYAUTHORIZATION"=false,"EMPLOYEENAME" = '',"EMPLOYEEEMAIL" = '',"EMPLOYEESERIAL" = '',"EMPLOYEEAREA" = '',"MNGRNAME" = '${mngrName}',"MNGREMAIL" = '${mngrEmail}', "DATE" = '${date}'
     WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query data" con el query SQL
-                "limit":10,
+                "limit":100000,
                 "separator":";",
                 "stop_on_error":"yes"
             }
@@ -537,7 +537,7 @@ module.exports.peripheralSecurityAuthorize = (req,res,next) => {
         const queryData = {
             "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "SECURITYAUTHORIZATION" = true,"ISINSIDE"=false, "DATE" = '${date}'
 WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query data" con el query SQL
-            "limit":10,
+            "limit":100000,
             "separator":";",
             "stop_on_error":"yes"
         }
@@ -627,4 +627,70 @@ module.exports.peripheralsByEmail = (req,res) => {
         });
     })
     
+}
+
+module.exports.peripheralsInAndOutByDateData = (req,res) => {
+    const {date} = req.body; //formato YYYY-MM-DD
+    
+    if (date.length > 10) {
+        console.log('inside');
+        console.log(date);
+        return res.json({message:"Invalid date length(max 10)"});
+    }
+    axios.post( authUrl, authData, authConf )
+    .then( response => {
+        // Making query
+        const token = response.data.access_token
+        const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
+        const queryData = {
+            "commands":`SELECT * FROM "SNT24490"."PERIPHERAL" WHERE "DATE" BETWEEN '2022-01-01' AND '${date} 23:59:59';`,//modificar "query data" con el query SQL
+            "limit":10000,
+            "separator":";",
+            "stop_on_error":"no"
+        }
+        const queryConf = {
+            headers: {
+                "authorization": `Bearer ${token}`,
+                "csontent-Type": 'application/json',
+                "x-deployment-id": credentials.DB_DEPLOYMENT_ID
+            }
+        }
+        axios.post(queryURL,queryData,queryConf)
+        .then(response => {
+            const getDataUrl = `${queryURL}/${response.data.id}`
+            axios.get(getDataUrl,queryConf)
+                .then(response => {
+                    try{
+                        console.log(response.data.results[0].rows)
+                        let devices = [{}]
+                        for(let i = 0; i < response.data.results[0].rows_count; i++){
+                            console.log(i)
+                            var newRow = {
+                                type: response.data.results[0].rows[i][0],
+                                brand: response.data.results[0].rows[i][1],
+                                model: response.data.results[0].rows[i][2],
+                                serialNumber: response.data.results[0].rows[i][3],
+                                acceptedConditions: response.data.results[0].rows[i][4],
+                                isInside: response.data.results[0].rows[i][5],
+                                securityAuthorization: response.data.results[0].rows[i][6],
+                                employeeName: response.data.results[0].rows[i][7],
+                                employeeEmail: response.data.results[0].rows[i][8],
+                                employeeSerial: response.data.results[0].rows[i][9],
+                                area: response.data.results[0].rows[i][10],
+                                mngrName: response.data.results[0].rows[i][11],
+                                mngrEmail: response.data.results[0].rows[i][12],
+                                date: response.data.results[0].rows[i][13],
+                                comment: response.data.results[0].rows[i][14],
+                                hidden: response.data.results[0].rows[i][15],
+                                }
+                            devices[i] = newRow
+                        }
+                        res.json(devices)
+                    } catch(error){
+                        console.error(error);
+                        return res.json({"message":"error"})
+                    }
+                })
+        })
+    });
 }
