@@ -6,3 +6,5 @@ const {hasToken,verifyToken,isAdmin} = require('../middleware/authJwt')
 router.route('/')
     .get([hasToken,verifyToken,isAdmin],controller.getRecords)
     .post([hasToken,verifyToken,isAdmin],controller.getRecordsByDate)
+
+module.exports = router;
