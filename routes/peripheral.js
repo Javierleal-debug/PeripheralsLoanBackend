@@ -1,11 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
-const credentials = require('../config/credentials.json');
-const jwt = require('jsonwebtoken');
-const config = require('../config/auth.config');
 const controller = require('../controllers/peripheral.controller');
-const { hasToken,verifyToken, isFocal, isSecurity } = require('../middleware/authJwt');
+const { hasToken,verifyToken, isAdmin , isFocal, isSecurity } = require('../middleware/authJwt');
 const { verifyPeripheralBodyMaxLength,verifySerialNumberNotDuplicated } = require('../middleware/verifyInput');
 const record = require('../middleware/createRecord');
 

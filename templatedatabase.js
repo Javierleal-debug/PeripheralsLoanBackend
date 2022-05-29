@@ -17,7 +17,7 @@ const authUrl = 'https://iam.cloud.ibm.com/identity/token';
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
             "commands":`query data;`,//modificar "query data" con el query SQL
-            "limit":10,
+            "limit":100000,
             "separator":";",
             "stop_on_error":"yes"
         }
@@ -36,14 +36,14 @@ const authUrl = 'https://iam.cloud.ibm.com/identity/token';
                     try{
                         if(response.data.results[0].error){
                             console.log(response.data.results[0])
-                            res.json({message:response.data.results[0].error})
+                            return res.json({message:response.data.results[0].error})
                         }else{
                             console.log(response.data.results[0])
                             res.json({message:"success"})//respuesta con success(json)
                         }
                     } catch(error){
                         console.error(error);//errorHandling
-                        res.status(404).json({message:error})
+                        return res.status(404).json({message:error})
                     }
                 })
         })            

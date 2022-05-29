@@ -29,55 +29,69 @@ function getDate() {
   }
 
 module.exports.peripherals = (req,res) => {
-    
-    axios.post( authUrl, authData, authConf )
-    .then( response => {
-        // Making query
-        const token = response.data.access_token
-        const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
-        const queryData = {
-            "commands":`SELECT * FROM "SNT24490"."PERIPHERAL" where "HIDDEN"=false;`,
-            "limit":10000,
-            "separator":";",
-            "stop_on_error":"yes"
-        }
-        const queryConf = {
-            headers: {
-                "authorization": `Bearer ${token}`,
-                "csontent-Type": 'application/json',
-                "x-deployment-id": credentials.DB_DEPLOYMENT_ID
+    var userToken = req.headers['x-access-token'];
+    jwt.verify(userToken,config.secret,(err,decoded) => {
+        var queryData;
+        if(decoded.userType==3){
+            queryData = {
+                "commands":`SELECT * FROM "SNT24490"."PERIPHERAL" where "HIDDEN"=false AND MNGREMAIL='${decoded.mngrEmail}';`,
+                "limit":10000,
+                "separator":";",
+                "stop_on_error":"yes"
+            }
+        }else{
+            queryData = {
+                "commands":`SELECT * FROM "SNT24490"."PERIPHERAL" where "HIDDEN"=false;`,
+                "limit":10000,
+                "separator":";",
+                "stop_on_error":"yes"
             }
         }
-        axios.post(queryURL,queryData,queryConf)
-        .then(response => {
-            //console.log(response.data)
-            const getDataUrl = `${queryURL}/${response.data.id}`
-            axios.get(getDataUrl,queryConf)
-                .then(response => {
-                    try{
-                        //console.log(response.data.results[0].rows)
-                        let devices = [{}]
-                        for(let i = 0; i < response.data.results[0].rows_count; i++){
-                            var newRow = {
-                                type: response.data.results[0].rows[i][0],
-                                brand: response.data.results[0].rows[i][1],
-                                model: response.data.results[0].rows[i][2],
-                                serialNumber: response.data.results[0].rows[i][3],
-                                acceptedConditions: response.data.results[0].rows[i][4],
-                                isInside: response.data.results[0].rows[i][5],
-                                securityAuthorization: response.data.results[0].rows[i][6],
-                                employeeName: response.data.results[0].rows[i][7]
-                                }
-                            devices[i] = newRow
+        axios.post( authUrl, authData, authConf )
+        .then( response => {
+            // Making query
+            const token = response.data.access_token
+            const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
+            
+            const queryConf = {
+                headers: {
+                    "authorization": `Bearer ${token}`,
+                    "csontent-Type": 'application/json',
+                    "x-deployment-id": credentials.DB_DEPLOYMENT_ID
+                }
+            }
+            axios.post(queryURL,queryData,queryConf)
+            .then(response => {
+                //console.log(response.data)
+                const getDataUrl = `${queryURL}/${response.data.id}`
+                axios.get(getDataUrl,queryConf)
+                    .then(response => {
+                        try{
+                            //console.log(response.data.results[0].rows)
+                            let devices = [{}]
+                            for(let i = 0; i < response.data.results[0].rows_count; i++){
+                                var newRow = {
+                                    type: response.data.results[0].rows[i][0],
+                                    brand: response.data.results[0].rows[i][1],
+                                    model: response.data.results[0].rows[i][2],
+                                    serialNumber: response.data.results[0].rows[i][3],
+                                    acceptedConditions: response.data.results[0].rows[i][4],
+                                    isInside: response.data.results[0].rows[i][5],
+                                    securityAuthorization: response.data.results[0].rows[i][6],
+                                    employeeName: response.data.results[0].rows[i][7]
+                                    }
+                                devices[i] = newRow
+                            }
+                            res.json(devices)
+                        } catch(error){
+                            console.error(error);
+                            res.json({"message":"error"})
                         }
-                        res.json(devices)
-                    } catch(error){
-                        console.error(error);
-                        res.json({"message":"error"})
-                    }
-                })
-        })            
-    });
+                    })
+            })            
+        });
+    })
+    
 }
 
 module.exports.peripheral = (req,res)=>{
@@ -633,8 +647,6 @@ module.exports.peripheralsInAndOutByDateData = (req,res) => {
     const {date} = req.body; //formato YYYY-MM-DD
     
     if (date.length > 10) {
-        console.log('inside');
-        console.log(date);
         return res.json({message:"Invalid date length(max 10)"});
     }
     axios.post( authUrl, authData, authConf )

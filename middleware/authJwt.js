@@ -27,6 +27,29 @@ const verifyToken = (req, res, next) => {
     })
 };
 
+const isAdmin = (req,res,next) => {//implementar funcion que revisa si el token recibido es de un focal
+    let token = req.headers["x-access-token"];
+
+    jwt.verify(token, config.secret, (err, decoded) => {
+        if (err) {
+            return res.status(403).send({
+                message:"Invalid Token"
+            });
+        }else{
+            if(decoded.userType==0){ // el 1 significa focal user y 0 admin
+                console.log("Is Admin");
+                next();
+            }else{
+                console.log("Admin User Required")
+                return res.status(403).send({
+                    message:"User Can't Use This Function"
+                });
+            }
+            
+        }
+    })
+}
+
 const isFocal = (req,res,next) => {//implementar funcion que revisa si el token recibido es de un focal
     let token = req.headers["x-access-token"];
 
@@ -76,6 +99,7 @@ const isSecurity = (req,res,next) => { //implementar funcion que revisa si el to
 const authJwt = {
     hasToken:hasToken,
     verifyToken:verifyToken,
+    isAdmin:isAdmin,
     isFocal:isFocal,
     isSecurity:isSecurity
 };

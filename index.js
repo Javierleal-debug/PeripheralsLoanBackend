@@ -16,9 +16,11 @@ app.use(bodyParser.urlencoded({extended: false}));
 //routes
 const authRoutes = require('./routes/auth');
 const peripheralRoutes = require('./routes/peripheral');
+const recordRoutes = require('./routes/record')
 
 app.use('/auth',authRoutes);
 app.use('/peripheral',peripheralRoutes);
+app.use('/record',recordRoutes)
 
 //settings
 app.set('json spaces',4);
