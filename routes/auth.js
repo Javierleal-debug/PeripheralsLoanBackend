@@ -1,16 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/auth.controller');
-const { hasToken,verifyToken, isFocal } = require('../middleware/authJwt');
+const { hasToken, verifyToken, isFocal } = require('../middleware/authJwt');
+const {verifyNoAuthSQLInjection} = require('../middleware/verifyInput');
 const {authJwt} = require('../middleware/index');
 
 router.route('/login')
     .post(
-        controller.signin
+        [verifyNoAuthSQLInjection],controller.signin
     );
 router.route('/signup')
     .post(
-        [hasToken,verifyToken,isFocal],
+        [hasToken,verifyToken,verifyNoAuthSQLInjection,isFocal],
         controller.signup
     )
 router.route('/hasAccess')

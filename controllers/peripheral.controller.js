@@ -96,8 +96,13 @@ module.exports.peripherals = (req,res) => {
 
 module.exports.peripheral = (req,res)=>{
     const {serialNumber} = req.params;
+    
     if(serialNumber.length > 100){
         res.json({message:"Invalid peripheral serialNumber length(max 100)"})
+    }
+    const onlyAllowedPattern = /^[A-Za-z0-9]+$/;
+    if(!serialNumber.match(onlyAllowedPattern)){
+        return res.status(400).json({ err: "No special characters, please!"})
     }
     axios.post( authUrl, authData, authConf )
     .then( response => {
@@ -196,6 +201,10 @@ module.exports.deletePeripheral = (req,res,next) => {
     if(serialNumber.length > 100){
         res.json({message:"Invalid peripheral serialNumber length(max 100)"})
     }
+    const onlyAllowedPattern = /^[A-Za-z0-9]+$/;
+    if(!serialNumber.match(onlyAllowedPattern)){
+        return res.status(400).json({ err: "No special characters, please!"})
+    }
     axios.post( authUrl, authData, authConf )
     .then( response => {
         // Making query
@@ -293,6 +302,10 @@ module.exports.peripheralsInAndOutByDate = (req,res) => {
         console.log('inside');
         console.log(date);
         return res.json({message:"Invalid date length(max 10)"});
+    }
+    const onlyAllowedPattern = /^[0-9 -]+$/;
+    if(!date.match(onlyAllowedPattern)){
+        return res.status(400).json({ err: "No special characters, please!"})
     }
     axios.post( authUrl, authData, authConf )
     .then( response => {
@@ -648,6 +661,10 @@ module.exports.peripheralsInAndOutByDateData = (req,res) => {
     
     if (date.length > 10) {
         return res.json({message:"Invalid date length(max 10)"});
+    }
+    const onlyAllowedPattern = /^[0-9 -]+$/;
+    if(!date.match(onlyAllowedPattern)){
+        return res.status(400).json({ err: "No special characters, please!"})
     }
     axios.post( authUrl, authData, authConf )
     .then( response => {

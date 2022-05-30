@@ -77,6 +77,38 @@ const verifyUserBodyMaxLength = (req,res,next) => {
 }
 
 const verifyNoSQLInjection = (req,res,next) => {
+    const onlyAllowedPattern = /^[A-Za-z0-9 _-.@]+$/;
+    var type,brand,model,serialNumber,employeeName,employeeEmail,employeeSerial,comment,date = "";
+    type=type+req.body.type;
+    brand+=req.body.brand;
+    model+=req.body.model;
+    serialNumber+=req.body.serialNumber;
+    employeeName+=req.body.employeeName;
+    employeeEmail+=req.body.employeeEmail;
+    employeeSerial+=req.body.employeeSerial
+    comment+=req.body.comment;
+    date+=req.body.date;
+    var userQuery=""+type+brand+model+serialNumber+employeeName+employeeEmail+employeeSerial+comment+date;
+    
+    if(!userQuery.match(onlyAllowedPattern)){
+      return res.status(400).json({ err: "No special characters, please!"})
+    }
+    next();
+}
+const verifyNoAuthSQLInjection = (req,res,next) => {
+    const onlyAllowedPattern = /^[A-Za-z0-9 _-.@]+$/;
+    var name,email,serial,area,mngrName,mngrEmail = "";
+    name+=req.body.name;
+    email+=req.body.email;
+    serial+=req.body.serial;
+    area+=req.body.area;
+    mngrName+=req.body.mngrName;
+    mngrEmail+=req.body.mngrEmail;
+    var userQuery=name+email+serial+area+mngrName+mngrEmail; 
+    
+    if(!userQuery.match(onlyAllowedPattern)){
+      return res.status(400).json({ err: "No special characters, please!"})
+    }
     next();
 }
 
@@ -131,6 +163,7 @@ const verifyInput = {
     verifyPeripheralBodyMaxLength:verifyPeripheralBodyMaxLength,
     verifyUserBodyMaxLength:verifyUserBodyMaxLength,
     verifyNoSQLInjection:verifyNoSQLInjection,
+    verifyNoAuthSQLInjection:verifyNoAuthSQLInjection,
     verifySerialNumberNotDuplicated:verifySerialNumberNotDuplicated
 };
 

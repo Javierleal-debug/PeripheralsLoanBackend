@@ -75,8 +75,13 @@ module.exports.getRecordsByDate = (req,res) => {
     const {date} = req.body; //formato YYYY-MM-DD
     
     if (date.length > 10) {
+        console.log('inside');
         console.log(date);
         return res.json({message:"Invalid date length(max 10)"});
+    }
+    const onlyAllowedPattern = /^[0-9 -]+$/;
+    if(!date.match(onlyAllowedPattern)){
+        return res.status(400).json({ err: "No special characters, please!"})
     }
     axios.post( authUrl, authData, authConf )
     .then( response => {
