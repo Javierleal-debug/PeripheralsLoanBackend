@@ -59,7 +59,7 @@ const verifyUserBodyMaxLength = (req,res,next) => {
     area+=req.body.area;
     mngrName+=req.body.mngrName;
     mngrEmail+=req.body.mngrEmail;
-    if(req.body.name > 60) {
+    if(name.length > 60) {
         return res.json({message:"Invalid User Name length(max 60)"})
     } else if(email.length > 254) {
         return res.json({message:"Invalid User Email length(max 254)"})
