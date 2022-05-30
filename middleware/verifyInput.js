@@ -77,7 +77,7 @@ const verifyUserBodyMaxLength = (req,res,next) => {
 }
 
 const verifyNoSQLInjection = (req,res,next) => {
-    const onlyAllowedPattern = /^[A-Za-z0-9 _-.@]+$/;
+    const onlyAllowedPattern = /^[-.@_A-Za-z0-9 ]+$/;
     var type,brand,model,serialNumber,employeeName,employeeEmail,employeeSerial,comment,date = "";
     type=type+req.body.type;
     brand+=req.body.brand;
@@ -91,12 +91,12 @@ const verifyNoSQLInjection = (req,res,next) => {
     var userQuery=""+type+brand+model+serialNumber+employeeName+employeeEmail+employeeSerial+comment+date;
     
     if(!userQuery.match(onlyAllowedPattern)){
-      return res.status(400).json({ err: "No special characters, please!"})
+      return res.status(400).json({ message: "No special characters, please!"})
     }
     next();
 }
 const verifyNoAuthSQLInjection = (req,res,next) => {
-    const onlyAllowedPattern = /^[A-Za-z0-9 _-.@]+$/;
+    const onlyAllowedPattern = /^[-.@_A-Za-z0-9 ]+$/;
     var name,email,serial,area,mngrName,mngrEmail = "";
     name+=req.body.name;
     email+=req.body.email;
@@ -107,7 +107,7 @@ const verifyNoAuthSQLInjection = (req,res,next) => {
     var userQuery=name+email+serial+area+mngrName+mngrEmail; 
     
     if(!userQuery.match(onlyAllowedPattern)){
-      return res.status(400).json({ err: "No special characters, please!"})
+      return res.status(400).json({ message: "No special characters, please!"})
     }
     next();
 }
