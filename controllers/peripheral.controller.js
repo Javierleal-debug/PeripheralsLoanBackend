@@ -68,19 +68,23 @@ module.exports.peripherals = (req,res) => {
                     .then(response => {
                         try{
                             //console.log(response.data.results[0].rows)
-                            let devices = [{}]
-                            for(let i = 0; i < response.data.results[0].rows_count; i++){
-                                var newRow = {
-                                    type: response.data.results[0].rows[i][0],
-                                    brand: response.data.results[0].rows[i][1],
-                                    model: response.data.results[0].rows[i][2],
-                                    serialNumber: response.data.results[0].rows[i][3],
-                                    acceptedConditions: response.data.results[0].rows[i][4],
-                                    isInside: response.data.results[0].rows[i][5],
-                                    securityAuthorization: response.data.results[0].rows[i][6],
-                                    employeeName: response.data.results[0].rows[i][7]
-                                    }
-                                devices[i] = newRow
+                            if(response.data.results[0].rows_count === 0){
+                                res.json("")
+                            }else{
+                                let devices = [{}]
+                                for(let i = 0; i < response.data.results[0].rows_count; i++){
+                                    var newRow = {
+                                        type: response.data.results[0].rows[i][0],
+                                        brand: response.data.results[0].rows[i][1],
+                                        model: response.data.results[0].rows[i][2],
+                                        serialNumber: response.data.results[0].rows[i][3],
+                                        acceptedConditions: response.data.results[0].rows[i][4],
+                                        isInside: response.data.results[0].rows[i][5],
+                                        securityAuthorization: response.data.results[0].rows[i][6],
+                                        employeeName: response.data.results[0].rows[i][7]
+                                        }
+                                    devices[i] = newRow
+                                }
                             }
                             res.json(devices)
                         } catch(error){
@@ -696,27 +700,31 @@ module.exports.peripheralsInAndOutByDateData = (req,res) => {
                     try{
                         console.log(response.data.results[0].rows)
                         let devices = [{}]
-                        for(let i = 0; i < response.data.results[0].rows_count; i++){
-                            console.log(i)
-                            var newRow = {
-                                type: response.data.results[0].rows[i][0],
-                                brand: response.data.results[0].rows[i][1],
-                                model: response.data.results[0].rows[i][2],
-                                serialNumber: response.data.results[0].rows[i][3],
-                                acceptedConditions: response.data.results[0].rows[i][4],
-                                isInside: response.data.results[0].rows[i][5],
-                                securityAuthorization: response.data.results[0].rows[i][6],
-                                employeeName: response.data.results[0].rows[i][7],
-                                employeeEmail: response.data.results[0].rows[i][8],
-                                employeeSerial: response.data.results[0].rows[i][9],
-                                area: response.data.results[0].rows[i][10],
-                                mngrName: response.data.results[0].rows[i][11],
-                                mngrEmail: response.data.results[0].rows[i][12],
-                                date: response.data.results[0].rows[i][13],
-                                comment: response.data.results[0].rows[i][14],
-                                hidden: response.data.results[0].rows[i][15],
-                                }
-                            devices[i] = newRow
+                        if(response.data.results[0].rows_count === 0){
+                            res.json("")
+                        }else{
+                            for(let i = 0; i < response.data.results[0].rows_count; i++){
+                                console.log(i)
+                                var newRow = {
+                                    type: response.data.results[0].rows[i][0],
+                                    brand: response.data.results[0].rows[i][1],
+                                    model: response.data.results[0].rows[i][2],
+                                    serialNumber: response.data.results[0].rows[i][3],
+                                    acceptedConditions: response.data.results[0].rows[i][4],
+                                    isInside: response.data.results[0].rows[i][5],
+                                    securityAuthorization: response.data.results[0].rows[i][6],
+                                    employeeName: response.data.results[0].rows[i][7],
+                                    employeeEmail: response.data.results[0].rows[i][8],
+                                    employeeSerial: response.data.results[0].rows[i][9],
+                                    area: response.data.results[0].rows[i][10],
+                                    mngrName: response.data.results[0].rows[i][11],
+                                    mngrEmail: response.data.results[0].rows[i][12],
+                                    date: response.data.results[0].rows[i][13],
+                                    comment: response.data.results[0].rows[i][14],
+                                    hidden: response.data.results[0].rows[i][15],
+                                    }
+                                devices[i] = newRow
+                            }
                         }
                         res.json(devices)
                     } catch(error){
