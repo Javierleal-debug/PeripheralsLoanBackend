@@ -32,21 +32,14 @@ module.exports.peripherals = (req,res) => {
     var userToken = req.headers['x-access-token'];
     jwt.verify(userToken,config.secret,(err,decoded) => {
         var queryData;
-        if(decoded.userType==3){
-            queryData = {
-                "commands":`SELECT * FROM "SNT24490"."PERIPHERAL" where "HIDDEN"=false AND MNGREMAIL='${decoded.mngrEmail}';`,
-                "limit":10000,
-                "separator":";",
-                "stop_on_error":"yes"
-            }
-        }else{
-            queryData = {
-                "commands":`SELECT * FROM "SNT24490"."PERIPHERAL" where "HIDDEN"=false;`,
-                "limit":10000,
-                "separator":";",
-                "stop_on_error":"yes"
-            }
+        
+        queryData = {
+            "commands":`SELECT * FROM "SNT24490"."PERIPHERAL" where "HIDDEN"=false;`,
+            "limit":10000,
+            "separator":";",
+            "stop_on_error":"yes"
         }
+        
         axios.post( authUrl, authData, authConf )
         .then( response => {
             // Making query
@@ -352,11 +345,8 @@ module.exports.peripheralsInAndOutByDate = (req,res) => {
 
 module.exports.peripheralRequest = (req,res) => {
     var userToken = req.headers['x-access-token'];
-    var {serialNumber} = req.body;
+    var {serialNumber,employeeName,employeeEmail,employeeSerial} = req.body;
     jwt.verify(userToken,config.secret, (err,decoded) => {
-        const employeeName = decoded.name;
-        const employeeEmail = decoded.id;
-        const employeeSerial = decoded.serial;
         const employeeArea = decoded.area;
         const mngrName = decoded.mngrName;
         const mngrEmail = decoded.mngrEmail;
