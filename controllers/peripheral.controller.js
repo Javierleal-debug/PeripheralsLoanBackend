@@ -152,7 +152,7 @@ module.exports.peripheral = (req,res)=>{
 
 module.exports.addPeripheral = (req,res,next) => {
     req.body.action="ADD PERIPHERAL";
-    var {type,brand,model,serialNumber,acceptedConditions,isInside,securityAuthorization,comment}=req.body;
+    var {type,brand,model,serialNumber,comment}=req.body;
     var date = getDate();
     const userToken = req.headers["x-access-token"];
     console.log(date);
@@ -168,7 +168,7 @@ module.exports.addPeripheral = (req,res,next) => {
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
             "commands":`insert INTO  "SNT24490"."PERIPHERAL" ("TYPE","BRAND","MODEL","SERIALNUMBER","ACCEPTEDCONDITIONS","ISINSIDE","SECURITYAUTHORIZATION","EMPLOYEEAREA","MNGRNAME","MNGREMAIL","DATE","COMMENT")
-             values('${type}','${brand}','${model}','${serialNumber}',${acceptedConditions},${isInside},${securityAuthorization},'${EmployeeArea}','${MngrName}','${MngrEmail}','${date}','${comment}');`,
+             values('${type}','${brand}','${model}','${serialNumber}',${false},${true},${false},'${EmployeeArea}','${MngrName}','${MngrEmail}','${date}','${comment}');`,
             "limit":10000,
             "separator":";",
             "stop_on_error":"yes"
