@@ -2,6 +2,8 @@ const axios = require('axios');
 const credentials = require('../config/credentials.json');
 const jwt = require('jsonwebtoken')
 const config = require('../config/auth.config');
+const nodemailer = require('nodemailer');
+const mailConfig = require('../config/mail.config')
 
 const authUrl = 'https://iam.cloud.ibm.com/identity/token'; 
 const authData = `grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey=${ credentials.ApiKey }`;
@@ -10,6 +12,20 @@ const authConf = {
         "Content-Type": "application/x-www-form-urlencoded"
     }
 };
+
+const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true, // true for 465, false for other ports
+    auth: {
+      user: mailConfig.user, // generated ethereal user
+      pass: mailConfig.pass, // generated ethereal password
+    },
+});
+
+transporter.verify().then(() => {
+    console.log("Ready to send emails")
+});
 
 function getDate() {
     var date = new Date()
@@ -343,7 +359,7 @@ module.exports.peripheralsInAndOutByDate = (req,res) => {
     });
 }
 
-module.exports.peripheralRequest = (req,res) => {
+module.exports.peripheralRequest = async (req,res) => {
     var userToken = req.headers['x-access-token'];
     var {serialNumber,employeeName,employeeEmail,employeeSerial} = req.body;
     jwt.verify(userToken,config.secret, (err,decoded) => {
@@ -359,9 +375,10 @@ module.exports.peripheralRequest = (req,res) => {
         const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
         const queryData = {
             "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "EMPLOYEENAME" = '${employeeName}',"EMPLOYEEEMAIL" = '${employeeEmail}',"EMPLOYEESERIAL" = '${employeeSerial}',"EMPLOYEEAREA" = '${employeeArea}',"MNGRNAME" = '${mngrName}',"MNGREMAIL" = '${mngrEmail}', "DATE" = '${date}'
-WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query data" con el query SQL
+WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;SELECT "TYPE","BRAND","MODEL","SERIALNUMBER" FROM "SNT24490"."PERIPHERAL" WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query data" con el query SQL
             "limit":10000000,
             "separator":";",
+            "multipleStatements":true,
             "stop_on_error":"yes"
         }
         const queryConf = {
@@ -377,22 +394,74 @@ WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query
             axios.get(getDataUrl,queryConf)
                 .then(response => {
                     try{
+                        console.log(response.data.results[1].rows[0]);
                         if(response.data.results[0].error){
                             console.log(response.data.results[0])
-                            res.json({message:response.data.results[0].error})
+                            return res.json({message:response.data.results[0].error})
                         }else{
                             console.log(response.data.results[0])
                             res.json({message:"success"})//respuesta con success(json)
+                              // send mail with defined transport object
+                            console.log('aqui')
+                            var mailOptions = {
+                                from: '"Peripheral User Agreement " <ibmperipheralloansequipo7@gmail.com>', // sender address
+                                to: employeeEmail, // list of receivers
+                                subject: "Peripheral User Agreement", // Subject line
+                                html: `
+                                <h1>Acuerdo de Usuario</h1>
+                                <p>
+                                    1.- Acepto ser responsable del cuidado del dispositivo; que me esta siendo
+                                    asignado como instrumento de trabajo, por lo que certifico que cuento con
+                                    los conocimientos y la capacidad necesaria para darle uso adecuado.
+                                </p>
+                                <p>
+                                    2.- En caso que el dispositivo se dañe por negligencia o mal uso del mismo
+                                    al ser este una herramienta de trabajo se revisara el caso para determinar
+                                    si hubo algún mal uso o descuido de las mismas, en el entendido de que
+                                    podría ser responsable de cubrir el costo de reparación o reposición
+                                </p>
+                                <p>
+                                    3.-El Dispositivo me está siendo asignado como instrumento de trabajo para
+                                    el desempeño de las actividades propias de mi puesto, por lo que seguiré
+                                    esta normativa referente al uso y cuidado de estos instrumentos
+                                    proporcionados por IBM y deberán de ser devueltos contra el requerimiento
+                                    de IBM con el desgaste de uso natural.
+                                </p>
+                                <p>
+                                    4.- En caso de extravió, o robo del Dispositivo por no cumplir con las
+                                    reglas de seguridad establecidas por la compañía o no entregarla en la
+                                    fecha establecida de devolución, seré responsable de reponer el monto que
+                                    se me señale.
+                                </p>
+                                <p>Peripheral: </p>
+                                <p>Tipo: ${response.data.results[1].rows[0][0]}</p>
+                                <p>Marca: ${response.data.results[1].rows[0][1]}</p>
+                                <p>Modelo: ${response.data.results[1].rows[0][2]}</p>
+                                <p>Numero Serial ${response.data.results[1].rows[0][3]}</p>
+                                <a href="https://peripheral-loans-equipo7.mybluemix.net/#/devices/${serialNumber}">Si aceptas este acuerdo haz click aqui para confirmar y seguir con el proceso de "Peripheral Loan"</a>
+                                `
+                            };
+                            try{
+                                transporter.sendMail(mailOptions, function(error,info){
+                                    if (error) {
+                                        console.log(error);
+                                    } else {
+                                        console.log('Email sent: ' + info.response);
+                                    }
+                                });
+                            }catch(error){
+                                console.log(error)
+                            }
                         }
                     } catch(error){
                         console.error(error);//errorHandling
-                        res.status(404).json({message:error})
+                        return res.status(404).json({message:error})
                     }
                 })
         })            
     });
-    })
-}
+    });
+ }
 
 module.exports.peripheralLoan = (req,res,next) => {
     req.body.action="LOAN PERIPHERAL";

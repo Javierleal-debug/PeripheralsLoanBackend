@@ -23,7 +23,7 @@ router.route('/inOutDateData')
     .post([hasToken,verifyToken,isFocal],controller.peripheralsInAndOutByDateData)
 
 router.route('/request')
-    .post([hasToken,verifyToken,verifyPeripheralBodyMaxLength,verifyNoSQLInjection],controller.peripheralRequest)
+    .post([hasToken,verifyToken,isFocal,verifyPeripheralBodyMaxLength,verifyNoSQLInjection],controller.peripheralRequest)
 
 router.route('/loan')
     .post([hasToken,verifyToken,isFocal,verifyPeripheralBodyMaxLength,verifyNoSQLInjection,controller.peripheralLoan,record.recordGetInfo],record.createRecord)
