@@ -1,4 +1,7 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const mailConfig = require('./config/mail.config')
+
 function getDate() {
     var date = new Date()
     var day = date.getDate()
@@ -26,3 +29,7 @@ console.log(userQuery.match(onlyLettersPattern))
 if(!userQuery.match(onlyLettersPattern)){
     console.log( "No special characters, please!")
 }
+var serialNumber="FCD16HKE8PXGRC27UNR7HRKEI31SVI7GV";
+var employeeEmail="oscar@miranda.com"
+var serialNumberUrl = jwt.sign({serialNumber:serialNumber,email:employeeEmail},mailConfig.secret, {expiresIn: 172800})
+console.log(serialNumberUrl);

@@ -12,10 +12,6 @@ router.route('/')
     .post([hasToken,verifyToken,isFocal,verifyNoSQLInjection,verifyPeripheralBodyMaxLength,verifySerialNumberNotDuplicated,controller.addPeripheral,record.recordGetInfo],record.createRecord)
     //.delete([hasToken,verifyToken,isFocal],controller.deletePeripherals)
 
-router.route('/:serialNumber')
-    .get([hasToken,verifyToken],controller.peripheral)
-    .delete([hasToken,verifyToken,isFocal,controller.deletePeripheral,record.recordGetInfo],record.createRecord)
-
 router.route('/inOutDate')//YYYY-MM-DD  
     .post([hasToken,verifyToken],controller.peripheralsInAndOutByDate) //solo usa un parametro del body(la verificacion está dentro de la funcion)
 
@@ -38,6 +34,16 @@ router.route('/securityAuthorize')
     .post([hasToken,verifyToken,isSecurity,verifyPeripheralBodyMaxLength,verifyNoSQLInjection,controller.peripheralSecurityAuthorize,record.recordGetInfo],record.createRecord)
 
 router.route('/byEmail')
-    .post([hasToken,verifyToken,verifyNoSQLInjection],controller.peripheralsByEmail)
+    .get([hasToken,verifyToken,verifyNoSQLInjection],controller.peripheralsByEmail)
+
+router.route('/byMngrEmail')
+    .get([hasToken,verifyToken],controller.peripheralsByMngrEmail)
+
+router.route('/accept/:serialNumber')
+    .get(controller.peripheralAcceptConditions)
+
+router.route('/:serialNumber')
+    .get([hasToken,verifyToken],controller.peripheral)
+    .delete([hasToken,verifyToken,isFocal,controller.deletePeripheral,record.recordGetInfo],record.createRecord)
 
 module.exports=router; 

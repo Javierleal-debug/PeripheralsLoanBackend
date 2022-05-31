@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const config = require('../config/auth.config');
 const nodemailer = require('nodemailer');
 const mailConfig = require('../config/mail.config')
+const QRCode = require('qrcode');
 
 const authUrl = 'https://iam.cloud.ibm.com/identity/token'; 
 const authData = `grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey=${ credentials.ApiKey }`;
@@ -367,99 +368,103 @@ module.exports.peripheralRequest = async (req,res) => {
         const mngrName = decoded.mngrName;
         const mngrEmail = decoded.mngrEmail;
         date = getDate();
-        
-    axios.post( authUrl, authData, authConf )
-    .then( response => {
-        // Making query
-        const token = response.data.access_token
-        const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
-        const queryData = {
-            "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "EMPLOYEENAME" = '${employeeName}',"EMPLOYEEEMAIL" = '${employeeEmail}',"EMPLOYEESERIAL" = '${employeeSerial}',"EMPLOYEEAREA" = '${employeeArea}',"MNGRNAME" = '${mngrName}',"MNGREMAIL" = '${mngrEmail}', "DATE" = '${date}'
-WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;SELECT "TYPE","BRAND","MODEL","SERIALNUMBER" FROM "SNT24490"."PERIPHERAL" WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query data" con el query SQL
-            "limit":10000000,
-            "separator":";",
-            "multipleStatements":true,
-            "stop_on_error":"yes"
-        }
-        const queryConf = {
-            headers: {
-                "authorization": `Bearer ${token}`,
-                "csontent-Type": 'application/json',
-                "x-deployment-id": credentials.DB_DEPLOYMENT_ID
-            }
-        }
-        axios.post(queryURL,queryData,queryConf)
-        .then(response => {
-            const getDataUrl = `${queryURL}/${response.data.id}`
-            axios.get(getDataUrl,queryConf)
-                .then(response => {
-                    try{
-                        console.log(response.data.results[1].rows[0]);
-                        if(response.data.results[0].error){
-                            console.log(response.data.results[0])
-                            return res.json({message:response.data.results[0].error})
-                        }else{
-                            console.log(response.data.results[0])
-                            res.json({message:"success"})//respuesta con success(json)
-                              // send mail with defined transport object
-                            console.log('aqui')
-                            var mailOptions = {
-                                from: '"Peripheral User Agreement " <ibmperipheralloansequipo7@gmail.com>', // sender address
-                                to: employeeEmail, // list of receivers
-                                subject: "Peripheral User Agreement", // Subject line
-                                html: `
-                                <h1>Acuerdo de Usuario</h1>
-                                <p>
-                                    1.- Acepto ser responsable del cuidado del dispositivo; que me esta siendo
-                                    asignado como instrumento de trabajo, por lo que certifico que cuento con
-                                    los conocimientos y la capacidad necesaria para darle uso adecuado.
-                                </p>
-                                <p>
-                                    2.- En caso que el dispositivo se dañe por negligencia o mal uso del mismo
-                                    al ser este una herramienta de trabajo se revisara el caso para determinar
-                                    si hubo algún mal uso o descuido de las mismas, en el entendido de que
-                                    podría ser responsable de cubrir el costo de reparación o reposición
-                                </p>
-                                <p>
-                                    3.-El Dispositivo me está siendo asignado como instrumento de trabajo para
-                                    el desempeño de las actividades propias de mi puesto, por lo que seguiré
-                                    esta normativa referente al uso y cuidado de estos instrumentos
-                                    proporcionados por IBM y deberán de ser devueltos contra el requerimiento
-                                    de IBM con el desgaste de uso natural.
-                                </p>
-                                <p>
-                                    4.- En caso de extravió, o robo del Dispositivo por no cumplir con las
-                                    reglas de seguridad establecidas por la compañía o no entregarla en la
-                                    fecha establecida de devolución, seré responsable de reponer el monto que
-                                    se me señale.
-                                </p>
-                                <p>Peripheral: </p>
-                                <p>Tipo: ${response.data.results[1].rows[0][0]}</p>
-                                <p>Marca: ${response.data.results[1].rows[0][1]}</p>
-                                <p>Modelo: ${response.data.results[1].rows[0][2]}</p>
-                                <p>Numero Serial ${response.data.results[1].rows[0][3]}</p>
-                                <a href="https://peripheral-loans-equipo7.mybluemix.net/#/devices/${serialNumber}">Si aceptas este acuerdo haz click aqui para confirmar y seguir con el proceso de "Peripheral Loan"</a>
-                                `
-                            };
-                            try{
-                                transporter.sendMail(mailOptions, function(error,info){
-                                    if (error) {
-                                        console.log(error);
-                                    } else {
-                                        console.log('Email sent: ' + info.response);
-                                    }
-                                });
-                            }catch(error){
-                                console.log(error)
-                            }
-                        }
-                    } catch(error){
-                        console.error(error);//errorHandling
-                        return res.status(404).json({message:error})
+        QRCode.toDataURL(`https://peripheral-loans-equipo7.mybluemix.net/#/devices/${serialNumber}`,(err,url) => {
+            axios.post( authUrl, authData, authConf )
+            .then( response => {
+                // Making query
+                const token = response.data.access_token
+                const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
+                const queryData = {
+                    "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "EMPLOYEENAME" = '${employeeName}',"EMPLOYEEEMAIL" = '${employeeEmail}',"EMPLOYEESERIAL" = '${employeeSerial}',"EMPLOYEEAREA" = '${employeeArea}',"MNGRNAME" = '${mngrName}',"MNGREMAIL" = '${mngrEmail}', "DATE" = '${date}'
+        WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;SELECT "TYPE","BRAND","MODEL","SERIALNUMBER" FROM "SNT24490"."PERIPHERAL" WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false;`,//modificar "query data" con el query SQL
+                    "limit":10000000,
+                    "separator":";",
+                    "multipleStatements":true,
+                    "stop_on_error":"yes"
+                }
+                const queryConf = {
+                    headers: {
+                        "authorization": `Bearer ${token}`,
+                        "csontent-Type": 'application/json',
+                        "x-deployment-id": credentials.DB_DEPLOYMENT_ID
                     }
-                })
-        })            
-    });
+                }
+                axios.post(queryURL,queryData,queryConf)
+                .then(response => {
+                    const getDataUrl = `${queryURL}/${response.data.id}`
+                    axios.get(getDataUrl,queryConf)
+                        .then(response => {
+                            try{
+                                console.log(response.data.results[1].rows[0]);
+                                if(response.data.results[0].error){
+                                    console.log(response.data.results[0])
+                                    return res.json({message:response.data.results[0].error})
+                                }else{
+                                    console.log(response.data.results[0])
+                                    res.json({message:"success"})//respuesta con success(json)
+                                    // send mail with defined transport object
+                                    console.log('aqui')
+                                    var serialNumberUrl = jwt.sign({serialNumber:serialNumber,email:employeeEmail},mailConfig.secret, {expiresIn: 172800})
+                                    var mailOptions = {
+                                        from: '"Peripheral User Agreement " <ibmperipheralloansequipo7@gmail.com>', // sender address
+                                        to: employeeEmail, // list of receivers
+                                        subject: "Peripheral User Agreement", // Subject line
+                                        html: `
+                                        <h1>Acuerdo de Usuario</h1>
+                                        <p>
+                                            1.- Acepto ser responsable del cuidado del dispositivo; que me esta siendo
+                                            asignado como instrumento de trabajo, por lo que certifico que cuento con
+                                            los conocimientos y la capacidad necesaria para darle uso adecuado.
+                                        </p>
+                                        <p>
+                                            2.- En caso que el dispositivo se dañe por negligencia o mal uso del mismo
+                                            al ser este una herramienta de trabajo se revisara el caso para determinar
+                                            si hubo algún mal uso o descuido de las mismas, en el entendido de que
+                                            podría ser responsable de cubrir el costo de reparación o reposición
+                                        </p>
+                                        <p>
+                                            3.-El Dispositivo me está siendo asignado como instrumento de trabajo para
+                                            el desempeño de las actividades propias de mi puesto, por lo que seguiré
+                                            esta normativa referente al uso y cuidado de estos instrumentos
+                                            proporcionados por IBM y deberán de ser devueltos contra el requerimiento
+                                            de IBM con el desgaste de uso natural.
+                                        </p>
+                                        <p>
+                                            4.- En caso de extravió, o robo del Dispositivo por no cumplir con las
+                                            reglas de seguridad establecidas por la compañía o no entregarla en la
+                                            fecha establecida de devolución, seré responsable de reponer el monto que
+                                            se me señale.
+                                        </p>
+                                        <p>Peripheral: </p>
+                                        <p>Tipo: ${response.data.results[1].rows[0][0]}</p>
+                                        <p>Marca: ${response.data.results[1].rows[0][1]}</p>
+                                        <p>Modelo: ${response.data.results[1].rows[0][2]}</p>
+                                        <p>Numero Serial ${response.data.results[1].rows[0][3]}</p>
+                                        <a href="https://peripheralsloanbackend.mybluemix.net/peripheral/accept/${serialNumberUrl}">Si aceptas este acuerdo haz click aqui para confirmar y seguir con el proceso de "Peripheral Loan"(Este link expira en 48hrs)</a>
+                                        <p>Despues de aceptar el acuerdo dirigete con un guardia para que escanee el QR: </p><img src="${url}">
+                                        `
+                                    };
+                                    try{
+                                        transporter.sendMail(mailOptions, function(error,info){
+                                            if (error) {
+                                                console.log(error);
+                                            } else {
+                                                console.log('Email sent: ' + info.response);
+                                            }
+                                        });
+                                    }catch(error){
+                                        console.log(error)
+                                    }
+                                }
+                            } catch(error){
+                                console.error(error);//errorHandling
+                                return res.status(404).json({message:error})
+                            }
+                        })
+                })            
+            });
+        })
+        
     });
  }
 
@@ -791,4 +796,117 @@ module.exports.peripheralsInAndOutByDateData = (req,res) => {
                 })
         })
     });
+}
+
+module.exports.peripheralsByMngrEmail = (req,res) => {
+    const userToken = req.headers['x-access-token'];
+    jwt.verify(userToken,config.secret,(err,decoded) => {
+        const mngrEmail = decoded.mngrEmail
+        //console.log(email)
+        axios.post( authUrl, authData, authConf )
+        .then( response => {
+            // Making query
+            const token = response.data.access_token
+            const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
+            const queryData = {
+                "commands":`SELECT * FROM "SNT24490"."PERIPHERAL" where "HIDDEN"=false and "MNGREMAIL"='${mngrEmail}';`,
+                "limit":10000,
+                "separator":";",
+                "stop_on_error":"yes"
+            }
+            const queryConf = {
+                headers: {
+                    "authorization": `Bearer ${token}`,
+                    "csontent-Type": 'application/json',
+                    "x-deployment-id": credentials.DB_DEPLOYMENT_ID
+                }
+            }
+            axios.post(queryURL,queryData,queryConf)
+            .then(response => {
+                //console.log(response.data)
+                const getDataUrl = `${queryURL}/${response.data.id}`
+                axios.get(getDataUrl,queryConf)
+                    .then(response => {
+                        try{
+                            //console.log(response.data.results[0])
+                            if(response.data.results[0].rows_count === 0){
+                                res.json("")
+                            }else{
+                                let devices = []
+                                for(let i = 0; i < response.data.results[0].rows_count; i++){
+                                    var newRow = {
+                                        type: response.data.results[0].rows[i][0],
+                                        brand: response.data.results[0].rows[i][1],
+                                        model: response.data.results[0].rows[i][2],
+                                        serialNumber: response.data.results[0].rows[i][3],
+                                        acceptedConditions: response.data.results[0].rows[i][4],
+                                        isInside: response.data.results[0].rows[i][5],
+                                        securityAuthorization: response.data.results[0].rows[i][6],
+                                        employeeName: response.data.results[0].rows[i][7],
+                                        date: response.data.results[0].rows[i][13]
+                                        }
+                                    devices[i] = newRow
+                                }
+                                res.json(devices)
+                            }
+                        } catch(error){
+                            console.error(error);
+                            res.json({"message":"error"})
+                        }
+                    })
+            })            
+        });
+    })   
+}
+
+module.exports.peripheralAcceptConditions = (req,res) => {
+    const serialNumberUrl = req.params.serialNumber;
+    jwt.verify(serialNumberUrl,mailConfig.secret, (err,decoded) => {
+        if(err){
+            return res.status(404).json({message:"something is wrong"})
+        }
+        var date = getDate();
+        const serialNumber = decoded.serialNumber;
+        const email = decoded.email;
+        axios.post( authUrl, authData, authConf )
+        .then( response => {
+            // Making query
+            const token = response.data.access_token
+            const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
+            const queryData = {
+                "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "ACCEPTEDCONDITIONS" = true,"DATE" = '${date}'
+                WHERE "SERIALNUMBER" = '${serialNumber}' and "HIDDEN"=false AND "EMPLOYEEEMAIL"='${email}';`,//modificar "query data" con el query SQL
+                "limit":100000,
+                "separator":";",
+                "stop_on_error":"yes"
+            }
+            const queryConf = {
+                headers: {
+                    "authorization": `Bearer ${token}`,
+                    "csontent-Type": 'application/json',
+                    "x-deployment-id": credentials.DB_DEPLOYMENT_ID
+                }
+            }
+            axios.post(queryURL,queryData,queryConf)
+            .then(response => {
+                const getDataUrl = `${queryURL}/${response.data.id}`
+                axios.get(getDataUrl,queryConf)
+                    .then(response => {
+                        try{
+                            if(response.data.results[0].error){
+                                console.log(response.data.results[0])
+                                return res.json({message:response.data.results[0].error})
+                            }else{
+                                console.log(response.data.results[0])
+                                res.json({message:"success"})//respuesta con success(json)
+                                
+                            }
+                        } catch(error){
+                            console.error(error);//errorHandling
+                            return res.status(404).json({message:error})
+                        }
+                    })
+            })            
+        });
+    })
 }
