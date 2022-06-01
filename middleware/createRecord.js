@@ -13,6 +13,9 @@ const authConf = {
 
 module.exports.recordGetInfo = (req,res,next) => {
     var {serialNumber} = req.body;
+    if(serialNumber.length<1){
+        return res.status(400).json({message:"Please provide the neccesary data"})
+    }
     axios.post( authUrl, authData, authConf )
     .then( response => {
         // Making query

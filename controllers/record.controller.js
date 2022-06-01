@@ -74,10 +74,8 @@ module.exports.getRecords = (req,res) => {
 module.exports.getRecordsByDate = (req,res) => {
     const {date} = req.body; //formato YYYY-MM-DD
     
-    if (date.length > 10) {
-        console.log('inside');
-        console.log(date);
-        return res.json({message:"Invalid date length(max 10)"});
+    if (date.length !== 10 ) {
+        return res.json({message:"Invalid date length(should be 10)"});
     }
     const onlyAllowedPattern = /^[0-9 -]+$/;
     if(!date.match(onlyAllowedPattern)){

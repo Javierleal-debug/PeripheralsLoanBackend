@@ -314,7 +314,7 @@ module.exports.peripheralsInAndOutByDate = (req,res) => {
     const {date} = req.body; //formato YYYY-MM-DD
     
     if (date.length > 10 || date.length<1) {
-        return res.json({message:"Invalid date length(max 10)"});
+        return res.json({message:"Invalid date length(should be 10)"});
     }
     const onlyAllowedPattern = /^[0-9 -]+$/;
     if(!date.match(onlyAllowedPattern)){
@@ -746,7 +746,7 @@ module.exports.peripheralsInAndOutByDateData = (req,res) => {
     const {date} = req.body; //formato YYYY-MM-DD
     
     if (date.length !== 10 ) {
-        return res.json({message:"Invalid date length(max 10)"});
+        return res.json({message:"Invalid date length(should be 10)"});
     }
     const onlyAllowedPattern = /^[0-9 -]+$/;
     if(!date.match(onlyAllowedPattern)){

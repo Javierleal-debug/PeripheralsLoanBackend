@@ -65,6 +65,9 @@ module.exports.createUser = (req,res) => {
 
 module.exports.changePasswordAdmin = (req,res) => {
     const {employeeEmail} = req.body;
+    if(employeeEmail.length<1 || employeeEmail.length<254 || req.body.newPwd.length<1){
+        return res.status(400).json({message:"Please provide the neccesary data"})
+    }
     var newPwd = bcrypt.hashSync(req.body.pwd,8);
     axios.post( authUrl, authData, authConf )
     .then( response => {
@@ -108,6 +111,9 @@ module.exports.changePasswordAdmin = (req,res) => {
 
 module.exports.changePassword = (req,res) => {
     const {employeeEmail} = req.body;
+    if(employeeEmail.length<1 || employeeEmail.length<254 || req.body.newPwd.length<1){
+        return res.status(400).json({message:"Please provide the neccesary data"})
+    }
     var newPwd = bcrypt.hashSync(req.body.newPwd,8);
     axios.post( authUrl, authData, authConf )
     .then( response => {
@@ -151,6 +157,9 @@ module.exports.changePassword = (req,res) => {
 
 module.exports.changeUserType = (req,res) => {
     const {employeeEmail,userType} = req.body;
+    if(employeeEmail.length<1 || employeeEmail.length<254 || userType.length<1){
+        return res.status(400).json({message:"Please provide the neccesary data"})
+    }
     axios.post( authUrl, authData, authConf )
     .then( response => {
         // Making query
@@ -193,6 +202,9 @@ module.exports.changeUserType = (req,res) => {
 
 module.exports.deleteUser = (req,res) => {
     const {employeeEmail} = req.body;
+    if(employeeEmail.length<1 || employeeEmail.length<254){
+        return res.status(400).json({message:"Please provide the neccesary data"})
+    }
     axios.post( authUrl, authData, authConf )
     .then( response => {
         // Making query
