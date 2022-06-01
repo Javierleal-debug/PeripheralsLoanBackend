@@ -33,3 +33,5 @@ var serialNumber="FCD16HKE8PXGRC27UNR7HRKEI31SVI7GV";
 var employeeEmail="oscar@miranda.com"
 var serialNumberUrl = jwt.sign({serialNumber:serialNumber,email:employeeEmail},mailConfig.secret, {expiresIn: 172800})
 console.log(serialNumberUrl);
+var oldPwd='prueba123';
+

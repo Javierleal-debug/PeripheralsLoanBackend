@@ -76,57 +76,6 @@ module.exports.signin = (req,res)=>{
         });
 }
 
-module.exports.signup = (req,res) => {
-    const employeeName = req.body.name;
-    const employeeEmail = req.body.email;
-    const employeeSerial = req.body.serial;
-    const employeeArea = req.body.area;
-    const mngrName = req.body.mngrName;
-    const mngrEmail = req.body.mngrEmail;
-    const pwd=bcrypt.hashSync(req.body.pwd,8);
-    const usertypeid=req.body.userTypeId;
-
-    var adminToken = req.headers['x-access-token'];
-    jwt.verify(adminToken,config.secret, (err,decoded) => {
-        var adminEmail = decoded.id;
-        axios.post( authUrl, authData, authConf )
-        .then( response => {
-            // Making query
-            const token = response.data.access_token
-            const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
-            const queryData = {
-                "commands":`INSERT
-                INTO  "SNT24490"."USERS" ("NAME","EMAIL","SERIAL","AREA","MNGRNAME","MNGREMAIL","PASSWORD","USERTYPE")
-                VALUES('${employeeName}', '${employeeEmail}', '${employeeSerial}', '${employeeArea}', '${mngrName}', '${mngrEmail}', '${pwd}', ${usertypeid});`, //actualizar esta query
-                "limit":10,
-                "separator":";",
-                "stop_on_error":"yes"
-            }
-            const queryConf = {
-                headers: {
-                    "authorization": `Bearer ${token}`,
-                    "csontent-Type": 'application/json',
-                    "x-deployment-id": credentials.DB_DEPLOYMENT_ID
-                }
-            }
-            axios.post(queryURL,queryData,queryConf)
-            .then(response => {
-                const getDataUrl = `${queryURL}/${response.data.id}`
-                axios.get(getDataUrl,queryConf)
-                .then(response => {
-                    if(response.data.results[0].error){
-                        res.status(404).json({"message":response.data.results[0].error})
-                    }else {
-                        res.status(201).json({"message":"user created succesfully"})
-                    }
-                    console.log(response.data.results[0].error)
-                    console.log(bcrypt.hashSync("prueba123",8));
-                })
-            })            
-        });
-    })
-}
-
 module.exports.hasAccess = (req,res) => {
     res.json({"access":true});
 }
