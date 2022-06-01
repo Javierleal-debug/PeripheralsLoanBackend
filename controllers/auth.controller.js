@@ -47,32 +47,32 @@ module.exports.signin = (req,res)=>{
                 const getDataUrl = `${queryURL}/${response.data.id}`
                 axios.get(getDataUrl,queryConf)
                     .then(response => {
-                        try{
-                            var userData=response.data.results[0].rows[0];
-                            var passwordIsValid = bcrypt.compareSync(
-                                pwd,
-                                response.data.results[0].rows[0][6]
-                            );
-                    
-                            if (!passwordIsValid) {
-                                return res.status(401).send({message: "Invalid Password"});
-                            }
-                            
-                            var token = jwt.sign({name:userData[0],id: email,serial:userData[2],area:userData[3],mngrName:userData[4],mngrEmail:userData[5],userType:userData[7]}, config.secret, {expiresIn: 86400})//añadir tipo de usuario en el token
-                            
-                            //console.log(token);
-
-                            res.status(200).json({
-                                email: email,
-                                accessToken: token
-                            })
-                            
-                        } catch(error){
-                            console.error(error);
-                            return res.status(404).json({message:"User not found"})
+                        var userData=response.data.results[0].rows[0];
+                        var passwordIsValid = bcrypt.compareSync(
+                            pwd,
+                            response.data.results[0].rows[0][6]
+                        );
+                
+                        if (!passwordIsValid) {
+                            return res.status(401).send({message: "Invalid Password"});
                         }
-                    })
-            })            
+                        
+                        var token = jwt.sign({name:userData[0],id: email,serial:userData[2],area:userData[3],mngrName:userData[4],mngrEmail:userData[5],userType:userData[7]}, config.secret, {expiresIn: 86400})//añadir tipo de usuario en el token
+                        
+                        //console.log(token);
+
+                        res.status(200).json({
+                            email: email,
+                            accessToken: token
+                        })
+                    }).catch((error)=>{
+                        console.error(error);
+                        return res.status(404).json({message:"User not found"})
+                    }) 
+            })
+            .catch((error)=>{
+                return res.status(401).send({message: "Bearer token not working, try again in a minute"});
+            })  
         });
 }
 
