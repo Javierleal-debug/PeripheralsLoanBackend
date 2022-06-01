@@ -405,7 +405,7 @@ module.exports.peripheralRequest = async (req,res) => {
                                     return res.json({message:response.data.results[0].error})
                                 }else{
                                     console.log(response.data.results[0])
-                                    res.json({message:"success"})//respuesta con success(json)
+                                    
                                     // send mail with defined transport object
                                     console.log('aqui')
                                     var serialNumberUrl = jwt.sign({serialNumber:serialNumber,email:employeeEmail},mailConfig.secret, {expiresIn: 172800})
@@ -454,6 +454,7 @@ module.exports.peripheralRequest = async (req,res) => {
                                                 console.log(error);
                                             } else {
                                                 console.log('Email sent: ' + info.response);
+                                                res.json({message:"success"})//respuesta con success(json)
                                             }
                                         });
                                     }catch(error){
@@ -929,7 +930,7 @@ module.exports.peripheralAcceptConditions = (req,res) => {
                                 return res.json({message:response.data.results[0].error})
                             }else{
                                 console.log(response.data.results[0])
-                                res.json({message:"success"})//respuesta con success(json)
+                                res.json({message:"success",serialNumber:serialNumber})//respuesta con success(json)
                                 
                             }
                         } catch(error){
