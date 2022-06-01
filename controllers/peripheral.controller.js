@@ -444,7 +444,7 @@ module.exports.peripheralRequest = async (req,res) => {
                                         <p>Marca: ${response.data.results[1].rows[0][1]}</p>
                                         <p>Modelo: ${response.data.results[1].rows[0][2]}</p>
                                         <p>Numero Serial ${response.data.results[1].rows[0][3]}</p>
-                                        <a href="https://peripheralsloanbackend.mybluemix.net/peripheral/accept/${serialNumberUrl}">Si aceptas este acuerdo haz click aqui para confirmar y seguir con el proceso de "Peripheral Loan"(Este link expira en 48hrs)</a>
+                                        <a href="https://peripheral-loans-equipo7.mybluemix.net/#/confirmation/${serialNumberUrl}">Si aceptas este acuerdo haz click aqui para confirmar y seguir con el proceso de "Peripheral Loan"(Este link expira en 48hrs)</a>
                                         <p>Despues de aceptar el acuerdo dirigete con un guardia para que escanee el QR: </p><img src="${url}">
                                         `
                                     };
@@ -892,7 +892,7 @@ module.exports.peripheralsByMngrEmail = (req,res) => {
 }
 
 module.exports.peripheralAcceptConditions = (req,res) => {
-    const serialNumberUrl = req.params.serialNumber;
+    const serialNumberUrl = req.params.serialNumberUrl;
     jwt.verify(serialNumberUrl,mailConfig.secret, (err,decoded) => {
         if(err){
             return res.status(404).json({message:"something is wrong"})

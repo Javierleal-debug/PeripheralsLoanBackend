@@ -39,7 +39,7 @@ router.route('/byEmail')
 router.route('/byMngrEmail')
     .get([hasToken,verifyToken],controller.peripheralsByMngrEmail)
 
-router.route('/accept/:serialNumber')
+router.route('/accept/:serialNumberUrl')
     .get(controller.peripheralAcceptConditions)
 
 router.route('/:serialNumber')
