@@ -4,12 +4,15 @@ const {hasToken, verifyToken, isAdmin, correctPassword} = require('../middleware
 const {verifyNoAuthSQLInjection} = require('../middleware/verifyInput');
 const controller = require('../controllers/user.controller')
 
+router.route('/')
+    .get(
+        [hasToken,verifyToken,isAdmin],controller.getUsers
+    )
 router.route('/signup')
     .post(
         [hasToken,verifyToken,verifyNoAuthSQLInjection,isAdmin],
         controller.createUser
     )
-
 router.route('/changePasswordAdmin')
     .post(
         [hasToken,verifyToken,isAdmin],controller.changePasswordAdmin
@@ -26,5 +29,5 @@ router.route('/deleteUser')
     .post(
         [hasToken,verifyToken,isAdmin],controller.deleteUser
     )
-
+    
 module.exports = router;
