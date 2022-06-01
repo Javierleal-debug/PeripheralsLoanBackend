@@ -154,6 +154,9 @@ module.exports.peripheral = (req,res)=>{
 module.exports.addPeripheral = (req,res,next) => {
     req.body.action="ADD PERIPHERAL";
     var {type,brand,model,serialNumber,comment}=req.body;
+    if(brand.length<1 || model.length<1 || serialNumber<1){ //type is not proofchecked because of a middleware feature that already does the same
+        return res.json({message:'Please provide the necessary data'});
+    }
     var date = getDate();
     const userToken = req.headers["x-access-token"];
     console.log(date);
@@ -210,7 +213,7 @@ module.exports.addPeripheral = (req,res,next) => {
 module.exports.deletePeripheral = (req,res,next) => {
     req.body.action="DELETE PERIPHERAL";
     const {serialNumber} = req.params;
-    if(serialNumber.length > 100){
+    if(serialNumber.length > 100 || serialNumber.length<1){
         res.json({message:"Invalid peripheral serialNumber length(max 100)"})
     }
     const onlyAllowedPattern = /^[A-Za-z0-9]+$/;
@@ -310,9 +313,7 @@ module.exports.deletePeripherals = (req,res) => {
 module.exports.peripheralsInAndOutByDate = (req,res) => {
     const {date} = req.body; //formato YYYY-MM-DD
     
-    if (date.length > 10) {
-        console.log('inside');
-        console.log(date);
+    if (date.length > 10 || date.length<1) {
         return res.json({message:"Invalid date length(max 10)"});
     }
     const onlyAllowedPattern = /^[0-9 -]+$/;
@@ -363,6 +364,9 @@ module.exports.peripheralsInAndOutByDate = (req,res) => {
 module.exports.peripheralRequest = async (req,res) => {
     var userToken = req.headers['x-access-token'];
     var {serialNumber,employeeName,employeeEmail,employeeSerial} = req.body;
+    if(serialNumber.length<1 || employeeName.length<1 || employeeEmail.length<1 || employeeSerial.length<1){
+        return res.json({message:'Please provide the necessary data'});
+    }
     jwt.verify(userToken,config.secret, (err,decoded) => {
         const employeeArea = decoded.area;
         const mngrName = decoded.mngrName;
@@ -471,6 +475,9 @@ module.exports.peripheralRequest = async (req,res) => {
 module.exports.peripheralLoan = (req,res,next) => {
     req.body.action="LOAN PERIPHERAL";
     const {serialNumber} = req.body;
+    if(serialNumber.length<1){
+        return res.json({message:'Please provide the necessary data'});
+    }
     var date = getDate();
     axios.post( authUrl, authData, authConf )
     .then( response => {
@@ -518,6 +525,9 @@ module.exports.peripheralReset = (req,res,next) => {
     req.body.action="RESET PERIPHERAL"
     var userToken = req.headers['x-access-token'];
     var {serialNumber} = req.body;
+    if(serialNumber.length<1){
+        return res.json({message:'Please provide the necessary data'});
+    }
     var date = getDate();
     jwt.verify(userToken,config.secret, (err,decoded) => {
         var mngrName = decoded.name;
@@ -570,6 +580,9 @@ module.exports.peripheralReturn = (req,res,next) => {
     req.body.action="RETURN PERIPHERAL";
     var userToken = req.headers['x-access-token'];
     var {serialNumber} = req.body;
+    if(serialNumber.length<1){
+        return res.json({message:'Please provide the necessary data'});
+    }
     var date = getDate();
     jwt.verify(userToken,config.secret, (err,decoded) => {
         const mngrName = decoded.mngrName;
@@ -621,6 +634,9 @@ module.exports.peripheralReturn = (req,res,next) => {
 module.exports.peripheralSecurityAuthorize = (req,res,next) => {
     req.body.actions="SECURITY AUTHORIZE PERIPHERAL"
     const {serialNumber} = req.body;
+    if(serialNumber.length<1){
+        return res.json({message:'Please provide the necessary data'});
+    }
     date = getDate();
     axios.post( authUrl, authData, authConf )
     .then( response => {
@@ -729,7 +745,7 @@ module.exports.peripheralsByEmail = (req,res) => {
 module.exports.peripheralsInAndOutByDateData = (req,res) => {
     const {date} = req.body; //formato YYYY-MM-DD
     
-    if (date.length > 10) {
+    if (date.length !== 10 ) {
         return res.json({message:"Invalid date length(max 10)"});
     }
     const onlyAllowedPattern = /^[0-9 -]+$/;

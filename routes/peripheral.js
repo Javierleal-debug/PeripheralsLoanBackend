@@ -2,14 +2,14 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/peripheral.controller');
 const { hasToken,verifyToken, isAdmin , isFocal, isSecurity } = require('../middleware/authJwt');
-const { verifyPeripheralBodyMaxLength,verifySerialNumberNotDuplicated, verifyNoSQLInjection } = require('../middleware/verifyInput');
+const { verifyPeripheralBodyMaxLength,verifySerialNumberNotDuplicated, verifyNoSQLInjection, verifyPeripheralType } = require('../middleware/verifyInput');
 const record = require('../middleware/createRecord');
 
 
 
 router.route('/')
     .get([hasToken,verifyToken],controller.peripherals)
-    .post([hasToken,verifyToken,isFocal,verifyNoSQLInjection,verifyPeripheralBodyMaxLength,verifySerialNumberNotDuplicated,controller.addPeripheral,record.recordGetInfo],record.createRecord)
+    .post([hasToken,verifyToken,isFocal,verifyPeripheralType,verifyNoSQLInjection,verifyPeripheralBodyMaxLength,verifySerialNumberNotDuplicated,controller.addPeripheral,record.recordGetInfo],record.createRecord)
     //.delete([hasToken,verifyToken,isFocal],controller.deletePeripherals)
 
 router.route('/inOutDate')//YYYY-MM-DD  

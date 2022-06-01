@@ -15,7 +15,7 @@ const authUrl = 'https://iam.cloud.ibm.com/identity/token';
 module.exports.signin = (req,res)=>{
     const {email,pwd} = req.body;
     try{
-        if(email.length<0 || pwd.length<0){
+        if(email.length<1 || pwd.length<1){
             return res.json({message:"email and/or password not provided"})
         }
     }catch(e){

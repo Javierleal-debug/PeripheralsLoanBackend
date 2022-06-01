@@ -91,9 +91,11 @@ const verifyNoSQLInjection = (req,res,next) => {
     var userQuery=""+type+brand+model+serialNumber+employeeName+employeeEmail+employeeSerial+comment+date;
     
     if(!userQuery.match(onlyAllowedPattern)){
-      return res.status(400).json({ message: "No special characters, please!"})
+        return res.status(400).json({ message: "No special characters, please!"})
+    }else{
+        next();
     }
-    next();
+    
 }
 const verifyNoAuthSQLInjection = (req,res,next) => {
     const onlyAllowedPattern = /^[-.@_A-Za-z0-9 ]+$/;
@@ -108,8 +110,10 @@ const verifyNoAuthSQLInjection = (req,res,next) => {
     
     if(!userQuery.match(onlyAllowedPattern)){
       return res.status(400).json({ message: "No special characters, please!"})
+    }else{
+        next();
     }
-    next();
+    
 }
 
 const verifySerialNumberNotDuplicated = (req,res,next) => {
@@ -158,13 +162,54 @@ const verifySerialNumberNotDuplicated = (req,res,next) => {
     });
 }
 
+const verifyPeripheralType = (req,res,next) => {
+    const {type} = req.body;
+    const validTypes = [
+        'Monitor',
+        'Mouse',
+        'Keyboard',
+        'Headset',
+        'Adapter',
+        'Computer',
+        'Tablet',
+        'Laptop',
+        'Touchscreen RB Pi',
+        'Camera / Webcam',
+        'Personal labeler',
+        'OTP Hardware',
+        'Mobile Phone',
+        'Virtual Assistant',
+        'Trackpad',
+        'Power Adapter / Charger',
+        'Apple TV',
+        'Articulating Mount',
+        'HDD / SSD',
+        'HDMI Cable',
+        'USB-C Charge cable',
+        'USB Memory',
+        'Combo Keyboard Mouse',
+        'Multiport Adapter',
+        'Video Adapter',
+        'Docking Station',
+        'Others',
+      ]
+
+    if(!validTypes.includes(type)){
+        return res.status(400).json({message: "Valid Peripheral Types only!"})
+    }else{
+        next();
+    }
+
+}
+
 const verifyInput = {
     verifySignup:verifySignup,
     verifyPeripheralBodyMaxLength:verifyPeripheralBodyMaxLength,
     verifyUserBodyMaxLength:verifyUserBodyMaxLength,
     verifyNoSQLInjection:verifyNoSQLInjection,
     verifyNoAuthSQLInjection:verifyNoAuthSQLInjection,
-    verifySerialNumberNotDuplicated:verifySerialNumberNotDuplicated
+    verifySerialNumberNotDuplicated:verifySerialNumberNotDuplicated,
+    verifyPeripheralType:verifyPeripheralType
 };
 
 module.exports = verifyInput;
