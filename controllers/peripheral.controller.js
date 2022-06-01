@@ -777,7 +777,22 @@ module.exports.peripheralsInAndOutByDateData = (req,res) => {
                 .then(response => {
                     try{
                         console.log(response.data.results[0].rows)
-                        let devices = [{}]
+                        let devices = [{type: "Type",
+                            brand: "Brand",
+                            model: "Model",
+                            serialNumber: "Serial Number",
+                            acceptedConditions: "Accepted Conditions",
+                            isInside: "Is Inside",
+                            securityAuthorization: "Security Authorization",
+                            employeeName: "Employee Name",
+                            employeeEmail: "Employee Email",
+                            employeeSerial: "Employee Serial",
+                            area: "Area",
+                            mngrName: "Manager Name",
+                            mngrEmail: "Manager Email",
+                            date: "Date",
+                            comment: "Comment",
+                            hidden: "Hidden"}]
                         if(response.data.results[0].rows_count === 0){
                             res.json("")
                         }else{
@@ -801,7 +816,7 @@ module.exports.peripheralsInAndOutByDateData = (req,res) => {
                                     comment: response.data.results[0].rows[i][14],
                                     hidden: response.data.results[0].rows[i][15],
                                     }
-                                devices[i] = newRow
+                                devices[i+1] = newRow
                             }
                         }
                         res.json(devices)
