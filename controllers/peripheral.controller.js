@@ -832,7 +832,7 @@ module.exports.peripheralsInAndOutByDateData = (req,res) => {
 module.exports.peripheralsByMngrEmail = (req,res) => {
     const userToken = req.headers['x-access-token'];
     jwt.verify(userToken,config.secret,(err,decoded) => {
-        const mngrEmail = decoded.mngrEmail
+        const mngrEmail = decoded.id
         //console.log(email)
         axios.post( authUrl, authData, authConf )
         .then( response => {
