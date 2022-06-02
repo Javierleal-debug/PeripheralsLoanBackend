@@ -8,6 +8,10 @@ router.route('/')
     .get(
         [hasToken,verifyToken,isAdmin],controller.getUsers
     )
+router.route('/:email')
+    .get(
+        [hasToken,verifyToken,isAdmin],controller.getUser
+    )
 router.route('/signup')
     .post(
         [hasToken,verifyToken,verifyNoAuthSQLInjection,isAdmin],
