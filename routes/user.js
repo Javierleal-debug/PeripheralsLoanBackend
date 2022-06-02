@@ -8,10 +8,6 @@ router.route('/')
     .get(
         [hasToken,verifyToken,isAdmin],controller.getUsers
     )
-router.route('/:email')
-    .get(
-        [hasToken,verifyToken,isAdmin],controller.getUser
-    )
 router.route('/signup')
     .post(
         [hasToken,verifyToken,verifyNoAuthSQLInjection,isAdmin],
@@ -32,6 +28,10 @@ router.route('/changeUserType')
 router.route('/deleteUser')
     .post(
         [hasToken,verifyToken,isAdmin],controller.deleteUser
+    )
+router.route('/:email')
+    .get(
+        [hasToken,verifyToken,isAdmin],controller.getUser
     )
     
 module.exports = router;
