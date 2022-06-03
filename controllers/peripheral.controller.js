@@ -187,6 +187,7 @@ module.exports.addPeripheral = (req,res,next) => {
 module.exports.deletePeripheral = (req,res,next) => {
     req.body.action="DELETE PERIPHERAL";
     const {serialNumber} = req.params;
+    const {comment} = req.body;
     if(serialNumber.length > 100 || serialNumber.length<1){
         res.json({message:"Invalid peripheral serialNumber length(max 100)"})
     }
@@ -197,7 +198,7 @@ module.exports.deletePeripheral = (req,res,next) => {
     const token = req.body.bearerToken;
     const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
     const queryData = {
-        "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "HIDDEN" = true WHERE "SERIALNUMBER" ='${serialNumber}' ;`,
+        "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "HIDDEN" = true, "COMMENT"='${comment}' WHERE "SERIALNUMBER" ='${serialNumber}' ;`,
         "limit":10000,
         "separator":";",
         "stop_on_error":"yes"
