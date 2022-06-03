@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const {hasToken, verifyToken, isAdmin, correctPassword} = require('../middleware/authJwt');
 const {verifyNoAuthSQLInjection} = require('../middleware/verifyInput');
-const controller = require('../controllers/user.controller')
+const controller = require('../controllers/user.controller');
+const { getBearerToken } = require('../middleware/bearerToken');
 
 router.route('/')
     .get(
@@ -19,7 +20,7 @@ router.route('/changePasswordAdmin')
     )
 router.route('/changePassword')
     .post(
-        [hasToken,verifyToken,correctPassword],controller.changePassword
+        [hasToken,verifyToken,getBearerToken,correctPassword],controller.changePassword
     )
 router.route('/changeUserType')
     .post(
