@@ -11,7 +11,7 @@ const { getBearerToken } = require('../middleware/bearerToken');
 router.route('/')
     .get([hasToken,verifyToken,getBearerToken],controller.peripherals)
     .post([hasToken,verifyToken,isFocal,verifyPeripheralType,verifyNoSQLInjection,verifyPeripheralBodyMaxLength,getBearerToken,verifySerialNumberNotDuplicated,controller.addPeripheral,record.recordGetInfo],record.createRecord)
-    //.delete([hasToken,verifyToken,isFocal],controller.deletePeripherals)
+    .delete([hasToken,verifyToken,verifyNoSQLInjection,verifyPeripheralBodyMaxLength,isFocal,getBearerToken,controller.deletePeripherals,record.recordsGetInfo],record.createRecords)
 
 router.route('/inOutDate')//YYYY-MM-DD  
     .post([hasToken,verifyToken,getBearerToken],controller.peripheralsInAndOutByDate) //solo usa un parametro del body(la verificacion está dentro de la funcion)

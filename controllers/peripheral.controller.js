@@ -234,7 +234,9 @@ module.exports.deletePeripheral = (req,res,next) => {
     })
 }
 
-module.exports.deletePeripherals = (req,res) => {
+module.exports.deletePeripherals = (req,res,next) => {
+    req.body.action="DELETE PERIPHERALS";
+    const {comment} = req.body;
     const serialNumber = [];
     req.body.array.forEach((i)=>{
         serialNumber.push("'" + i + "'");
@@ -242,7 +244,7 @@ module.exports.deletePeripherals = (req,res) => {
     const token = req.body.bearerToken;
     const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
     const queryData = {
-        "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "HIDDEN" = true WHERE "SERIALNUMBER" in (${serialNumber});`,//modificar "query data" con el query SQL
+        "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "HIDDEN" = true, "COMMENT"='${comment}' WHERE "SERIALNUMBER" in (${serialNumber});`,//modificar "query data" con el query SQL
         "limit":1000000,
         "separator":";",
         "stop_on_error":"yes"
@@ -264,6 +266,7 @@ module.exports.deletePeripherals = (req,res) => {
                     if(!response.data.results[0].warning){
                         console.log(response.data/*.results[0]*/)
                         res.json({message:"success"})//respuesta con success(json)
+                        next();
                     }else{
                         console.log(response.data/*.results[0]*/)
                         res.json({message:response.data.results[0].warning})//respuesta con success(json)
