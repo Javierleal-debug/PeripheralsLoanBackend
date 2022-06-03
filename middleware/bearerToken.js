@@ -14,6 +14,9 @@ const getBearerToken = (req,res,next) => {
     .then( response => {
         req.body.bearerToken = response.data.access_token
     })
+    .catch((error)=>{
+        return res.status(401).send({message: "Bearer token not working, try again in a minute"});
+    })
 }
 
 const bearerToken = {
