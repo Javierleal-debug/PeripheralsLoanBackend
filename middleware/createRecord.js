@@ -79,7 +79,7 @@ module.exports.createRecord = (req,res) => {
         CURRENT TIMESTAMP,  	--DATE  TIMESTAMP(10)  Not null
         '${action}',                 	--ACTIONTYPE  VARCHAR(50)  Not null
         '${comment}'                	--COMMENT  VARCHAR(254)  
-        );;`,//modificar "query data" con el query SQL
+        );`,//modificar "query data" con el query SQL
         "limit":10,
         "separator":";",
         "stop_on_error":"yes"
