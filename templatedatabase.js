@@ -1,6 +1,5 @@
 const credentials=require('./config/credentials')
 const axios= require('axios');
-const res = require('express/lib/response');
 
 const token = req.body.bearerToken;
 const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
