@@ -124,7 +124,23 @@ module.exports.getRecordsByDate = (req,res) => {
                 .then(response => {
                     try{
                         //console.log(response.data.results[0].rows)
-                        let records = [{}]
+                        let records = [{recordId: "RecordId",
+                            type: "Type",
+                            brand: "Brand",
+                            model: "Model",
+                            serialNumber: "Serial Number",
+                            acceptedConditions: "Accepted Conditions",
+                            isInside: "Is Inside",
+                            securityAuthorization: "Security Authorization",
+                            employeeName: "Employee Name",
+                            employeeEmail: "Employee Email",
+                            employeeSerial: "Employee Serial",
+                            area: "Area",
+                            mngrName: "Manager Name",
+                            mngrEmail: "Manager Email",
+                            date: "Date",
+                            actionType: "ActionType",
+                            comment: "Comment"}]
                         for(let i = 0; i < response.data.results[0].rows_count; i++){
                             var newRow = {
                                 recordId: response.data.results[0].rows[i][0],
@@ -145,7 +161,7 @@ module.exports.getRecordsByDate = (req,res) => {
                                 actionType: response.data.results[0].rows[i][15],
                                 comment: response.data.results[0].rows[i][16],
                                 }
-                            records[i] = newRow
+                            records[i+1] = newRow
                         }
                         res.json(records)
                     } catch(error){
