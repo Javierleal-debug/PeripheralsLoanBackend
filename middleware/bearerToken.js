@@ -13,6 +13,7 @@ const getBearerToken = (req,res,next) => {
     axios.post( authUrl, authData, authConf )
     .then( response => {
         req.body.bearerToken = response.data.access_token
+        next();
     })
     .catch((error)=>{
         return res.status(401).send({message: "Bearer token not working, try again in a minute"});

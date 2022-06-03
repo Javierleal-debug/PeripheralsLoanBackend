@@ -9,42 +9,42 @@ const { getBearerToken } = require('../middleware/bearerToken');
 
 
 router.route('/')
-    .get([hasToken,verifyToken],controller.peripherals)
+    .get([hasToken,verifyToken,getBearerToken],controller.peripherals)
     .post([hasToken,verifyToken,isFocal,verifyPeripheralType,verifyNoSQLInjection,verifyPeripheralBodyMaxLength,getBearerToken,verifySerialNumberNotDuplicated,controller.addPeripheral,record.recordGetInfo],record.createRecord)
     //.delete([hasToken,verifyToken,isFocal],controller.deletePeripherals)
 
 router.route('/inOutDate')//YYYY-MM-DD  
-    .post([hasToken,verifyToken],controller.peripheralsInAndOutByDate) //solo usa un parametro del body(la verificacion está dentro de la funcion)
+    .post([hasToken,verifyToken,getBearerToken],controller.peripheralsInAndOutByDate) //solo usa un parametro del body(la verificacion está dentro de la funcion)
 
 router.route('/inOutDateData')
-    .post([hasToken,verifyToken,isFocal],controller.peripheralsInAndOutByDateData)
+    .post([hasToken,verifyToken,isFocal,getBearerToken],controller.peripheralsInAndOutByDateData)
 
 router.route('/request')
-    .post([hasToken,verifyToken,isFocal,verifyPeripheralBodyMaxLength,verifyNoSQLInjection],controller.peripheralRequest)
+    .post([hasToken,verifyToken,isFocal,verifyPeripheralBodyMaxLength,verifyNoSQLInjection],getBearerToken,controller.peripheralRequest)
 
 router.route('/loan')
-    .post([hasToken,verifyToken,isFocal,verifyPeripheralBodyMaxLength,verifyNoSQLInjection,controller.peripheralLoan,record.recordGetInfo],record.createRecord)
+    .post([hasToken,verifyToken,isFocal,verifyPeripheralBodyMaxLength,verifyNoSQLInjection,getBearerToken,controller.peripheralLoan,record.recordGetInfo],record.createRecord)
 
 router.route('/reset')
-    .post([hasToken,verifyToken,isFocal,verifyPeripheralBodyMaxLength,verifyNoSQLInjection,controller.peripheralReset,record.recordGetInfo],record.createRecord)
+    .post([hasToken,verifyToken,isFocal,verifyPeripheralBodyMaxLength,verifyNoSQLInjection,getBearerToken,controller.peripheralReset,record.recordGetInfo],record.createRecord)
 
 router.route('/return')
-    .post([hasToken,verifyToken,isFocal,verifyPeripheralBodyMaxLength,verifyNoSQLInjection,controller.peripheralReturn,record.recordGetInfo],record.createRecord)
+    .post([hasToken,verifyToken,isFocal,verifyPeripheralBodyMaxLength,verifyNoSQLInjection,getBearerToken,controller.peripheralReturn,record.recordGetInfo],record.createRecord)
 
 router.route('/securityAuthorize')
-    .post([hasToken,verifyToken,isSecurity,verifyPeripheralBodyMaxLength,verifyNoSQLInjection,controller.peripheralSecurityAuthorize,record.recordGetInfo],record.createRecord)
+    .post([hasToken,verifyToken,isSecurity,verifyPeripheralBodyMaxLength,verifyNoSQLInjection,getBearerToken,controller.peripheralSecurityAuthorize,record.recordGetInfo],record.createRecord)
 
 router.route('/byEmail')
-    .get([hasToken,verifyToken,verifyNoSQLInjection],controller.peripheralsByEmail)
+    .get([hasToken,verifyToken,verifyNoSQLInjection,getBearerToken],controller.peripheralsByEmail)
 
 router.route('/byMngrEmail')
-    .get([hasToken,verifyToken],controller.peripheralsByMngrEmail)
+    .get([hasToken,verifyToken,getBearerToken],controller.peripheralsByMngrEmail)
 
 router.route('/accept/:serialNumberUrl')
-    .get(controller.peripheralAcceptConditions)
+    .get([getBearerToken],controller.peripheralAcceptConditions)
 
 router.route('/:serialNumber')
-    .get([hasToken,verifyToken],controller.peripheral)
-    .delete([hasToken,verifyToken,isFocal,controller.deletePeripheral,record.recordGetInfo],record.createRecord)
+    .get([hasToken,verifyToken,getBearerToken],controller.peripheral)
+    .delete([hasToken,verifyToken,isFocal,getBearerToken,controller.deletePeripheral,record.recordGetInfo],record.createRecord)
 
 module.exports=router; 

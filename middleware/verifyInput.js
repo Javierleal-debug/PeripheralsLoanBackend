@@ -5,10 +5,6 @@ const axios = require('axios');
 const credentials = require('../config/credentials.json');
 const jwt = require('jsonwebtoken')
 
-const verifySignup = (req,res,next) => {
-    next();
-}
-
 const verifyPeripheralBodyMaxLength = (req,res,next) => {
     var type,brand,model,serialNumber,employeeName,employeeEmail,employeeSerial,comment,date = "";
     type=type+req.body.type;
@@ -193,7 +189,6 @@ const verifyPeripheralType = (req,res,next) => {
 }
 
 const verifyInput = {
-    verifySignup:verifySignup,
     verifyPeripheralBodyMaxLength:verifyPeripheralBodyMaxLength,
     verifyUserBodyMaxLength:verifyUserBodyMaxLength,
     verifyNoSQLInjection:verifyNoSQLInjection,

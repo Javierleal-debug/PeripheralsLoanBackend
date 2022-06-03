@@ -7,16 +7,16 @@ const { getBearerToken } = require('../middleware/bearerToken');
 
 router.route('/')
     .get(
-        [hasToken,verifyToken,isAdmin],controller.getUsers
+        [hasToken,verifyToken,isAdmin,getBearerToken],controller.getUsers
     )
 router.route('/signup')
     .post(
-        [hasToken,verifyToken,verifyNoAuthSQLInjection,isAdmin],
+        [hasToken,verifyToken,verifyNoAuthSQLInjection,isAdmin,getBearerToken],
         controller.createUser
     )
 router.route('/changePasswordAdmin')
     .post(
-        [hasToken,verifyToken,isAdmin],controller.changePasswordAdmin
+        [hasToken,verifyToken,isAdmin,getBearerToken],controller.changePasswordAdmin
     )
 router.route('/changePassword')
     .post(
@@ -24,15 +24,15 @@ router.route('/changePassword')
     )
 router.route('/changeUserType')
     .post(
-        [hasToken,verifyToken,isAdmin],controller.changeUserType
+        [hasToken,verifyToken,isAdmin,getBearerToken],controller.changeUserType
     )
 router.route('/deleteUser')
     .post(
-        [hasToken,verifyToken,isAdmin],controller.deleteUser
+        [hasToken,verifyToken,isAdmin,getBearerToken],controller.deleteUser
     )
 router.route('/:email')
     .get(
-        [hasToken,verifyToken,isAdmin],controller.getUser
+        [hasToken,verifyToken,isAdmin,getBearerToken],controller.getUser
     )
     
 module.exports = router;

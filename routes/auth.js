@@ -4,10 +4,11 @@ const controller = require('../controllers/auth.controller');
 const { hasToken, verifyToken, isFocal, isAdmin } = require('../middleware/authJwt');
 const {verifyNoAuthSQLInjection} = require('../middleware/verifyInput');
 const {authJwt} = require('../middleware/index');
+const { getBearerToken } = require('../middleware/bearerToken');
 
 router.route('/login')
     .post(
-        [verifyNoAuthSQLInjection],controller.signin
+        [verifyNoAuthSQLInjection,getBearerToken],controller.signin
     );
 
 router.route('/hasAccess')
