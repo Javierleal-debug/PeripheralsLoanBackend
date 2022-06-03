@@ -178,16 +178,18 @@ module.exports.changeUserType = (req,res) => {
 }
 
 module.exports.deleteUser = (req,res) => {
-    const {employeeEmail} = req.body;
+    const {employeeEmail,mngrEmail,mngrName} = req.body;
     if(employeeEmail.length<1 || employeeEmail.length<254){
         return res.status(400).json({message:"Please provide the neccesary data"})
     }
     const token = req.body.bearerToken;
     const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
     const queryData = {
-        "commands":`DELETE FROM "SNT24490"."USERS" WHERE "EMAIL" = '${employeeEmail}';`,//modificar "query data" con el query SQL
+        "commands":`DELETE FROM "SNT24490"."USERS" WHERE "EMAIL" = '${employeeEmail}';
+        UPDATE "SNT24490"."PERIPHERAL" SET "MNGRNAME" = '${mngrName}',"MNGREMAIL" = '${mngrEmail}' WHERE "MNGREMAIL" = '${employeeEmail}';`,//modificar "query data" con el query SQL
         "limit":100000,
         "separator":";",
+        "multipleStatements":true,
         "stop_on_error":"yes"
     }
     const queryConf = {
