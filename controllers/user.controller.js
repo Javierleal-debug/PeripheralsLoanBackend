@@ -266,11 +266,13 @@ module.exports.getUsers = (req,res) =>{
 }
 
 module.exports.getUser = (req,res) =>{
-    const email = req.params;
+    const {email} = req.params;
     const token = req.body.bearerToken;
     const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
     const queryData = {
-        "commands":`SELECT "NAME", "EMAIL", "SERIAL", "AREA", "MNGRNAME", "MNGREMAIL", "USERTYPE" FROM "SNT24490"."USERS" WHERE "EMAIL"=${email};`,
+        "commands":`SELECT "NAME", "EMAIL", "SERIAL", "AREA", "MNGRNAME", "MNGREMAIL", "USERTYPE" 
+            FROM "SNT24490"."USERS" 
+            WHERE "EMAIL"='${email}';`,
         "limit":100000,
         "separator":";",
         "stop_on_error":"yes"
@@ -288,16 +290,16 @@ module.exports.getUser = (req,res) =>{
         axios.get(getDataUrl,queryConf)
             .then(response => {
                 try{
-                var user = {
-                    employeeName: response.data.results[0].rows[0][0],
-                    employeeEmail: response.data.results[0].rows[0][1],
-                    serial: response.data.results[0].rows[0][2],
-                    area: response.data.results[0].rows[0][3],
-                    mngrName: response.data.results[0].rows[0][4],
-                    mngrEmail: response.data.results[0].rows[0][5],
-                    userType: response.data.results[0].rows[0][6],
-                }
-                res.json(user)
+                    var user = {
+                        employeeName: response.data.results[0].rows[0][0],
+                        employeeEmail: response.data.results[0].rows[0][1],
+                        serial: response.data.results[0].rows[0][2],
+                        area: response.data.results[0].rows[0][3],
+                        mngrName: response.data.results[0].rows[0][4],
+                        mngrEmail: response.data.results[0].rows[0][5],
+                        userType: response.data.results[0].rows[0][6],
+                    }
+                    res.json(user)
                 } catch(error){
                     console.error(error);//errorHandling
                     return res.status(404).json({message:error})
