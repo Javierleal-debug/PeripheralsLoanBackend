@@ -26,6 +26,10 @@ router.route('/changeUserType')
     .post(
         [hasToken,verifyToken,isAdmin,getBearerToken],controller.changeUserType
     )
+router.route('/changeManager')
+    .post(
+        [hasToken,verifyToken,isAdmin,getBearerToken],controller.changeManager
+    )
 router.route('/deleteUser')
     .post(
         [hasToken,verifyToken,isAdmin,getBearerToken],controller.deleteUser
