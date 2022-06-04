@@ -6,6 +6,11 @@ const bcrypt = require('bcryptjs');
 
 
 module.exports.createUser = (req,res) => {
+    const onlyAllowedPattern = /^[-.@_A-Za-z0-9]+$/;
+    if(!req.body.pwd.match(onlyAllowedPattern)){
+      return res.status(400).json({ message: "No special characters on password, please!"})
+    }
+
     const employeeName = req.body.name;
     const employeeEmail = req.body.email;
     const employeeSerial = req.body.serial;
@@ -52,11 +57,17 @@ module.exports.createUser = (req,res) => {
 }
 
 module.exports.changePasswordAdmin = (req,res) => {
+    const onlyAllowedPattern = /^[-.@_A-Za-z0-9]+$/;
+    if(!req.body.newPwd.match(onlyAllowedPattern)){
+      return res.status(400).json({ message: "No special characters on password, please!"})
+    }
+    console.log("1")
     const {employeeEmail} = req.body;
-    if(employeeEmail.length<1 || employeeEmail.length<254 || req.body.newPwd.length<1){
+    if(employeeEmail.length<1 || employeeEmail.length>254 || req.body.newPwd.length<1 || req.body.newPwd.length>21){
         return res.status(400).json({message:"Please provide the neccesary data"})
     }
-    var newPwd = bcrypt.hashSync(req.body.pwd,8);
+    console.log("2")
+    var newPwd = bcrypt.hashSync(req.body.newPwd,8);
     const token = req.body.bearerToken;
     const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
     const queryData = {
@@ -95,6 +106,11 @@ module.exports.changePasswordAdmin = (req,res) => {
 }
 
 module.exports.changePassword = (req,res) => {
+    const onlyAllowedPattern = /^[-.@_A-Za-z0-9]+$/;
+    if(!req.body.newPwd.match(onlyAllowedPattern)){
+      return res.status(400).json({ message: "No special characters on password, please!"})
+    }
+
     const {employeeEmail} = req.body;
     if(employeeEmail.length<1 || employeeEmail.length<254 || req.body.newPwd.length<1){
         return res.status(400).json({message:"Please provide the neccesary data"})
@@ -138,7 +154,7 @@ module.exports.changePassword = (req,res) => {
 
 module.exports.changeUserType = (req,res) => {
     const {employeeEmail,userType} = req.body;
-    if(employeeEmail.length<1 || employeeEmail.length<254 || userType.length<1){
+    if(employeeEmail.length<1 || employeeEmail.length>254 || userType.length<1){
         return res.status(400).json({message:"Please provide the neccesary data"})
     }
     const token = req.body.bearerToken;
@@ -179,7 +195,7 @@ module.exports.changeUserType = (req,res) => {
 
 module.exports.deleteUser = (req,res) => {
     const {employeeEmail,mngrEmail,mngrName} = req.body;
-    if(employeeEmail.length<1 || employeeEmail.length<254){
+    if(employeeEmail.length<1 || employeeEmail.length>254){
         return res.status(400).json({message:"Please provide the neccesary data"})
     }
     const token = req.body.bearerToken;
