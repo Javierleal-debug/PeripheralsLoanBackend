@@ -148,6 +148,50 @@ const verifySerialNumberNotDuplicated = (req,res,next) => {
 
 }
 
+const verifyEmailNotDuplicated = (req,res,next) => {
+    var {email} = req.body;
+
+    const token = req.body.bearerToken
+    const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
+    const queryData = {
+        "commands":`SELECT COUNT "EMAIL" FROM "SNT24490"."USERS" WHERE "EMAIL" = '${email}';`,//modificar "query data" con el query SQL
+        "limit":10,
+        "separator":";",
+        "stop_on_error":"yes"
+    }
+    const queryConf = {
+        headers: {
+            "authorization": `Bearer ${token}`,
+            "csontent-Type": 'application/json',
+            "x-deployment-id": credentials.DB_DEPLOYMENT_ID
+        }
+    }
+    axios.post(queryURL,queryData,queryConf)
+    .then(response => {
+        const getDataUrl = `${queryURL}/${response.data.id}`
+        axios.get(getDataUrl,queryConf)
+            .then(response => {
+                try{
+                    if(response.data.results[0].error){
+                        console.log(response.data.results[0])
+                        return res.json({message:response.data.results[0].error})
+                    }else{
+                        console.log(response.data.results[0])
+                        if(response.data.results[0].rows[0][0]>0){
+                            return res.json({message:"Email already registered"})
+                        }else{
+                            next();
+                        }
+                    }
+                } catch(error){
+                    console.error(error);//errorHandling
+                    return res.status(404).json({message:error})
+                }
+            })
+    })            
+
+}
+
 const verifyPeripheralType = (req,res,next) => {
     const {type} = req.body;
     const validTypes = [
@@ -194,7 +238,8 @@ const verifyInput = {
     verifyNoSQLInjection:verifyNoSQLInjection,
     verifyNoAuthSQLInjection:verifyNoAuthSQLInjection,
     verifySerialNumberNotDuplicated:verifySerialNumberNotDuplicated,
-    verifyPeripheralType:verifyPeripheralType
+    verifyPeripheralType:verifyPeripheralType,
+    verifyEmailNotDuplicated:verifyEmailNotDuplicated
 };
 
 module.exports = verifyInput;

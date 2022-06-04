@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {hasToken, verifyToken, isAdmin, correctPassword} = require('../middleware/authJwt');
-const {verifyNoAuthSQLInjection} = require('../middleware/verifyInput');
+const {verifyNoAuthSQLInjection, verifyEmailNotDuplicated} = require('../middleware/verifyInput');
 const controller = require('../controllers/user.controller');
 const { getBearerToken } = require('../middleware/bearerToken');
 
@@ -11,7 +11,7 @@ router.route('/')
     )
 router.route('/signup')
     .post(
-        [hasToken,verifyToken,verifyNoAuthSQLInjection,isAdmin,getBearerToken],
+        [hasToken,verifyToken,verifyNoAuthSQLInjection,isAdmin,getBearerToken,verifyEmailNotDuplicated],
         controller.createUser
     )
 router.route('/changePasswordAdmin')

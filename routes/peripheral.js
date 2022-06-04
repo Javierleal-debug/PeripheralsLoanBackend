@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/peripheral.controller');
 const { hasToken,verifyToken, isAdmin , isFocal, isSecurity } = require('../middleware/authJwt');
-const { verifyPeripheralBodyMaxLength,verifySerialNumberNotDuplicated, verifyNoSQLInjection, verifyPeripheralType } = require('../middleware/verifyInput');
+const { verifyPeripheralBodyMaxLength, verifySerialNumberNotDuplicated, verifyNoSQLInjection, verifyPeripheralType } = require('../middleware/verifyInput');
 const record = require('../middleware/createRecord');
 const { getBearerToken } = require('../middleware/bearerToken');
 
