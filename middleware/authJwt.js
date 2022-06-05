@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/auth.config');
 const axios = require('axios')
 const credentials = require('../config/credentials.json')
+const bcrypt = require('bcryptjs');
 
 const hasToken = (req,res,next) =>{
     let token = req.headers["x-access-token"];
@@ -99,7 +100,7 @@ const isSecurity = (req,res,next) => { //implementar funcion que revisa si el to
 }
 
 const correctPassword = (req,res,next) => {
-    const {employeeEmail,pwd} = req.body;
+    const {employeeEmail, pwd} = req.body;
     const token = req.body.bearerToken;
     const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
     const queryData = {
@@ -130,9 +131,8 @@ const correctPassword = (req,res,next) => {
                             pwd,
                             response.data.results[0].rows[0][0]
                         );
-                
                         if (!passwordIsValid) {
-                            return res.status(401).send({message:"Invalid Password Contact an Admin for help"});
+                            return res.send({message:"Invalid Password Contact an Admin for help"});
                         }
                         console.log(response.data.results[0])
                         next();

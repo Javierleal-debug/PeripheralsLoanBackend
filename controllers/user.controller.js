@@ -110,11 +110,11 @@ module.exports.changePassword = (req,res) => {
     if(!req.body.newPwd.match(onlyAllowedPattern)){
       return res.status(400).json({ message: "No special characters on password, please!"})
     }
-
     const {employeeEmail} = req.body;
-    if(employeeEmail.length<1 || employeeEmail.length<254 || req.body.newPwd.length<1){
+    if(employeeEmail.length<1 || employeeEmail.length>254 || req.body.newPwd.length<1){
         return res.status(400).json({message:"Please provide the neccesary data"})
     }
+
     var newPwd = bcrypt.hashSync(req.body.newPwd,8);
     const token = req.body.bearerToken;
     const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
