@@ -324,6 +324,48 @@ module.exports.getUser = (req,res) =>{
     })            
 }
 
+module.exports.getUserName = (req,res) =>{
+    const email = req.body.email;
+    console.log(req.body)
+    console.log("email: "+email)
+    
+    const token = req.body.bearerToken;
+    const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
+    const queryData = {
+        "commands":`SELECT "NAME", "EMAIL", "SERIAL", "AREA", "MNGRNAME", "MNGREMAIL", "USERTYPE" 
+            FROM "SNT24490"."USERS" 
+            WHERE "EMAIL"='${email}';`,
+        "limit":100000,
+        "separator":";",
+        "stop_on_error":"yes"
+    }
+    const queryConf = {
+        headers: {
+            "authorization": `Bearer ${token}`,
+            "csontent-Type": 'application/json',
+            "x-deployment-id": credentials.DB_DEPLOYMENT_ID
+        }
+    }
+    axios.post(queryURL,queryData,queryConf)
+    .then(response => {
+        const getDataUrl = `${queryURL}/${response.data.id}`
+        axios.get(getDataUrl,queryConf)
+            .then(response => {
+                try{
+                    console.log(response.data.results[0].rows[0])
+                    var user = {
+                        employeeName: response.data.results[0].rows[0][0],
+                        employeeEmail: response.data.results[0].rows[0][1]
+                    }
+                    res.json(user)
+                } catch(error){
+                    console.error(error);//errorHandling
+                    return res.status(404).json({message:error})
+                }
+            })
+    })            
+}
+
 module.exports.changeManager = (req,res) => {
     const {employeeEmail,mngrEmail,mngrName} = req.body;
     if(employeeEmail.length<1 || employeeEmail.length>254 || mngrEmail.length<1 || mngrName.length>254 || mngrName.length<1 || mngrName.length>60){

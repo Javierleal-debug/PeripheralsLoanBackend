@@ -34,6 +34,10 @@ router.route('/deleteUser')
     .post(
         [hasToken,verifyToken,isAdmin,getBearerToken],controller.deleteUser
     )
+router.route('/name')
+    .post(
+        [hasToken,verifyToken,getBearerToken],controller.getUserName
+    )
 router.route('/:email')
     .get(
         [hasToken,verifyToken,isAdmin,getBearerToken],controller.getUser
