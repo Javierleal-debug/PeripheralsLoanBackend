@@ -581,7 +581,7 @@ module.exports.peripheralReturn = (req,res,next) => {
 }
 
 module.exports.peripheralSecurityAuthorize = (req,res,next) => {
-    req.body.actions="SECURITY AUTHORIZE PERIPHERAL"
+    req.body.action="SECURITY AUTHORIZE PERIPHERAL"
     const {serialNumber} = req.body;
     if(serialNumber.length<1){
         return res.json({message:'Please provide the necessary data'});
@@ -821,8 +821,9 @@ module.exports.peripheralsByMngrEmail = (req,res) => {
     })   
 }
 
-module.exports.peripheralAcceptConditions = (req,res) => {
+module.exports.peripheralAcceptConditions = (req,res,next) => {
     const serialNumberUrl = req.params.serialNumberUrl;
+    req.body.action = 'PERIPHERAL ACCEPT'
     jwt.verify(serialNumberUrl,mailConfig.secret, (err,decoded) => {
         if(err){
             return res.status(404).json({message:"something is wrong"})
@@ -856,8 +857,9 @@ module.exports.peripheralAcceptConditions = (req,res) => {
                             console.log(response.data.results[0])
                             return res.json({message:response.data.results[0].error})
                         }else{
-                            console.log(response.data.results[0])
-                            res.json({message:"success",serialNumber:serialNumber})//respuesta con success(json)
+                            req.body.serialNumber = serialNumber;
+                            res.json({message:"success",serialNumber:serialNumber})
+                            next();
                             
                         }
                     } catch(error){

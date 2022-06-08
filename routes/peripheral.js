@@ -20,7 +20,7 @@ router.route('/inOutDateData')
     .post([hasToken,verifyToken,isFocal,getBearerToken],controller.peripheralsInAndOutByDateData)
 
 router.route('/request')
-    .post([hasToken,verifyToken,isFocal,verifyPeripheralBodyMaxLength,verifyNoSQLInjection],getBearerToken,controller.peripheralRequest)
+    .post([hasToken,verifyToken,isFocal,verifyPeripheralBodyMaxLength,verifyNoSQLInjection,getBearerToken],controller.peripheralRequest)
 
 router.route('/loan')
     .post([hasToken,verifyToken,isFocal,verifyPeripheralBodyMaxLength,verifyNoSQLInjection,getBearerToken,controller.peripheralLoan,record.recordGetInfo],record.createRecord)
@@ -41,7 +41,7 @@ router.route('/byMngrEmail')
     .get([hasToken,verifyToken,getBearerToken],controller.peripheralsByMngrEmail)
 
 router.route('/accept/:serialNumberUrl')
-    .get([getBearerToken],controller.peripheralAcceptConditions)
+    .get([getBearerToken,controller.peripheralAcceptConditions,record.recordGetInfo],record.createRecord)
 
 router.route('/:serialNumber')
     .get([hasToken,verifyToken,getBearerToken],controller.peripheral)
