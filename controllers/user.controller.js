@@ -135,7 +135,7 @@ module.exports.changePassword = (req,res) => {
                 try{
                     if(response.data.results[0].error || response.data.results[0].warning){
                         console.log(response.data.results[0])
-                        return res.json({message:"User not found"})
+                        return res.status(404).json({message:"User not found"})
                     }else{
                         console.log(response.data.results[0])
                         res.json({message:"success"})//respuesta con success(json)
