@@ -206,9 +206,13 @@ module.exports.changeUserType = (req,res) => {
 
 module.exports.deleteUser = (req,res) => {
     const onlyAllowedPattern = /^[-.@_A-Za-z0-9 ]+$/;
+    const onlyAllowedEmailPattern = /^[-.@_A-Za-z0-9]+$/;
     const {employeeEmail,mngrEmail,mngrName} = req.body;
-    var query=employeeEmail+mngrEmail+mngrName;
-    if(!query.match(onlyAllowedPattern)){
+    var emails=employeeEmail+mngrEmail;
+    if(!mngrName.match(onlyAllowedPattern)){
+        return res.status(400).json({ message: "No special characters on data, please!"})
+    }
+    if(!emails.match(onlyAllowedEmailPattern)){
         return res.status(400).json({ message: "No special characters on data, please!"})
     }
     if(employeeEmail.length<1 || employeeEmail.length>254){
