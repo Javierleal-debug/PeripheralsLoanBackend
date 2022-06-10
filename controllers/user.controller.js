@@ -48,7 +48,7 @@ module.exports.createUser = (req,res) => {
             if(response.data.results[0].error){
                 res.status(404).json({"message":"Something went wrong"})
             }else {
-                res.json({"message":"success"})
+                res.json.status(201)({"message":"success"})
             }
         })
     })
@@ -133,16 +133,16 @@ module.exports.changePassword = (req,res) => {
         axios.get(getDataUrl,queryConf)
             .then(response => {
                 try{
-                    if(response.data.results[0].error){
+                    if(response.data.results[0].error || response.data.results[0].warning){
                         console.log(response.data.results[0])
-                        return res.json({message:response.data.results[0].error})
+                        return res.json({message:"User not found"})
                     }else{
                         console.log(response.data.results[0])
                         res.json({message:"success"})//respuesta con success(json)
                     }
                 } catch(error){
                     console.error(error);//errorHandling
-                    return res.status(404).json({message:error})
+                    return res.status(404).json({message:"error"})
                 }
             })
     })

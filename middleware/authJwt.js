@@ -122,9 +122,9 @@ const correctPassword = (req,res,next) => {
         axios.get(getDataUrl,queryConf)
             .then(response => {
                 try{
-                    if(response.data.results[0].error){
+                    if(response.data.results[0].error || response.data.results[0].warning){
                         console.log(response.data.results[0])
-                        return res.json({message:response.data.results[0].error})
+                        return res.status(404).json({message:"User not found"})
                     }else{
                         console.log(response.data.results[0].rows[0][0])
                         var passwordIsValid = bcrypt.compareSync(
@@ -132,14 +132,14 @@ const correctPassword = (req,res,next) => {
                             response.data.results[0].rows[0][0]
                         );
                         if (!passwordIsValid) {
-                            return res.send({message:"Invalid Password Contact an Admin for help"});
+                            return res.status(404).json({message:"Invalid Password Contact an Admin for help"});
                         }
                         console.log(response.data.results[0])
                         next();
                     }
                 } catch(error){
                     console.error(error);//errorHandling
-                    return res.status(404).json({message:error})
+                    return res.status(404).json({message:"error"})
                 }
             })
     })            
