@@ -174,7 +174,7 @@ module.exports.changeUserType = (req,res) => {
         axios.get(getDataUrl,queryConf)
             .then(response => {
                 try{
-                    if(response.data.results[0].error){
+                    if(response.data.results[0].error || response.data.results[0].warning){
                         console.log(response.data.results[0])
                         return res.status(404).json({message:"User not found"})
                     }else{
@@ -348,14 +348,17 @@ module.exports.getUserName = (req,res) =>{
         axios.get(getDataUrl,queryConf)
             .then(response => {
                 try{
-                    console.log(response.data.results[0].rows[0])
-                    var user = {
-                        employeeName: response.data.results[0].rows[0][0],
-                        employeeEmail: response.data.results[0].rows[0][1]
+
+                    if(response.data.results[0].error || response.data.results[0].warning || response.data.results[0].rows_count===0){
+                        return res.status(404).json({message:"User not found"})
+                    }else{
+                        var user = {
+                            employeeName: response.data.results[0].rows[0][0],
+                            employeeEmail: response.data.results[0].rows[0][1]
+                        }
+                        res.json(user)
                     }
-                    res.json(user)
                 } catch(error){
-                    console.error(error);//errorHandling
                     return res.status(404).json({message:"error"})
                 }
             })
@@ -390,7 +393,7 @@ module.exports.changeManager = (req,res) => {
                 try{
                     if(response.data.results[0].error || response.data.results[0].warning){
                         console.log(response.data.results[0])
-                        return res.json({message:"User not found"})
+                        return res.status(404).json({message:"User not found"})
                     }else{
                         console.log(response.data.results[0])
                         res.json({message:"success"})//respuesta con success(json)
