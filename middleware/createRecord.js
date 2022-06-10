@@ -113,9 +113,6 @@ module.exports.recordsGetInfo = (req,res,next) => {
     const serialNumber = [];
     req.body.array.forEach((i)=>{
         serialNumber.push("'" + i + "'");
-        if(i.length<1){
-            return res.status(400).json({message:"Please provide the neccesary data"})
-        }
     });
     
     const token = req.body.bearerToken;

@@ -235,6 +235,15 @@ module.exports.deletePeripheral = (req,res,next) => {
 }
 
 module.exports.deletePeripherals = (req,res,next) => {
+    for(i=0; i<req.body.array.length;i++){
+        if(!req.body.array[i].match(/^[-.@_A-Za-z0-9]+$/)){
+            return res.status(400).json({message: "No special characters, please!"})
+        }
+        if(req.body.array[i]<1 || req.body.array[i]>100){
+            return res.status(400).json({message:"Invalid data"})
+        }
+    };
+
     req.body.action="DELETE PERIPHERALS";
     const {comment} = req.body;
     const serialNumber = [];
@@ -269,12 +278,12 @@ module.exports.deletePeripherals = (req,res,next) => {
                         next();
                     }else{
                         console.log(response.data/*.results[0]*/)
-                        res.json({message:response.data.results[0].warning})//respuesta con success(json)
+                        return res.status(400).json({message:"Peripherals not found"})//respuesta con success(json)
                     }
                     
                 } catch(error){
                     console.error(error);//errorHandling
-                    res.status(404).json({message:"User not found"})
+                    return res.status(404).json({message:"Peripherals not found"})
                 }
             })
     })
