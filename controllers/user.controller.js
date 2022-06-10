@@ -47,10 +47,8 @@ module.exports.createUser = (req,res) => {
                 if(response.data.results[0].error){
                     res.status(404).json({"message":response.data.results[0].error})
                 }else {
-                    res.status(201).json({"message":"user created succesfully"})
+                    res.json({"message":"success"})
                 }
-                console.log(response.data.results[0].error)
-                console.log(bcrypt.hashSync("prueba123",8));
             })
         })            
     })
@@ -91,14 +89,14 @@ module.exports.changePasswordAdmin = (req,res) => {
                 try{
                     if(response.data.results[0].error){
                         console.log(response.data.results[0])
-                        return res.json({message:response.data.results[0].error})
+                        return res.json({message:"Something is wrong"})
                     }else{
                         console.log(response.data.results[0])
                         res.json({message:"success"})//respuesta con success(json)
                     }
                 } catch(error){
                     console.error(error);//errorHandling
-                    return res.status(404).json({message:error})
+                    return res.status(404).json({message:"error"})
                 }
             })
     })            
@@ -318,7 +316,7 @@ module.exports.getUser = (req,res) =>{
                     res.json(user)
                 } catch(error){
                     console.error(error);//errorHandling
-                    return res.status(404).json({message:error})
+                    return res.status(404).json({message:"User not found"})
                 }
             })
     })            
