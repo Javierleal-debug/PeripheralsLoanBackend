@@ -45,7 +45,7 @@ module.exports.createUser = (req,res) => {
             axios.get(getDataUrl,queryConf)
             .then(response => {
                 if(response.data.results[0].error){
-                    res.status(404).json({"message":response.data.results[0].error})
+                    res.status(404).json({"message":"Something went wrong"})
                 }else {
                     res.json({"message":"success"})
                 }
