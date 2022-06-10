@@ -280,7 +280,8 @@ module.exports.getUsers = (req,res) =>{
 }
 
 module.exports.getUser = (req,res) =>{
-    const {email} = req.params;
+    var {email} = req.params;
+    email=email.toLowerCase();
     const token = req.body.bearerToken;
     const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
     const queryData = {
@@ -323,9 +324,8 @@ module.exports.getUser = (req,res) =>{
 }
 
 module.exports.getUserName = (req,res) =>{
-    const email = req.body.email;
-    console.log(req.body)
-    console.log("email: "+email)
+    var email = req.body.email;
+    email=email.toLowerCase();
     
     const token = req.body.bearerToken;
     const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
@@ -358,7 +358,7 @@ module.exports.getUserName = (req,res) =>{
                     res.json(user)
                 } catch(error){
                     console.error(error);//errorHandling
-                    return res.status(404).json({message:error})
+                    return res.status(404).json({message:"error"})
                 }
             })
     })            
@@ -390,16 +390,16 @@ module.exports.changeManager = (req,res) => {
         axios.get(getDataUrl,queryConf)
             .then(response => {
                 try{
-                    if(response.data.results[0].error){
+                    if(response.data.results[0].error || response.data.results[0].warning){
                         console.log(response.data.results[0])
-                        return res.json({message:response.data.results[0].error})
+                        return res.json({message:"User not found"})
                     }else{
                         console.log(response.data.results[0])
                         res.json({message:"success"})//respuesta con success(json)
                     }
                 } catch(error){
                     console.error(error);//errorHandling
-                    return res.status(404).json({message:error})
+                    return res.status(404).json({message:"error"})
                 }
             })
     })
