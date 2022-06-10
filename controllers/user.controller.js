@@ -226,7 +226,7 @@ module.exports.deleteUser = (req,res) => {
                     }
                 } catch(error){
                     console.error(error);//errorHandling
-                    return res.status(404).json({message:error})
+                    return res.status(404).json({message:"error"})
                 }
             })
     }) 
