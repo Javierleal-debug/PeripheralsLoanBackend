@@ -59,12 +59,10 @@ module.exports.changePasswordAdmin = (req,res) => {
     if(!req.body.newPwd.match(onlyAllowedPattern)){
       return res.status(400).json({ message: "No special characters on password, please!"})
     }
-    console.log("1")
     const {employeeEmail} = req.body;
     if(employeeEmail.length<1 || employeeEmail.length>254 || req.body.newPwd.length<1 || req.body.newPwd.length>21){
         return res.status(400).json({message:"Please provide the neccesary data"})
     }
-    console.log("2")
     var newPwd = bcrypt.hashSync(req.body.newPwd,8);
     const token = req.body.bearerToken;
     const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
@@ -89,7 +87,7 @@ module.exports.changePasswordAdmin = (req,res) => {
                 try{
                     if(response.data.results[0].error || response.data.results[0].warning){
                         console.log(response.data.results[0])
-                        return res.status(404).json({message:"Something is wrong"})
+                        return res.status(404).json({message:"User not found"})
                     }else{
                         console.log(response.data.results[0])
                         res.json({message:"success"})//respuesta con success(json)
