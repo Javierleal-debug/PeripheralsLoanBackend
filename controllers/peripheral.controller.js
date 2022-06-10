@@ -323,7 +323,7 @@ module.exports.peripheralsInAndOutByDate = (req,res) => {
                     if(response.data.results[0].error){
                         console.log(date);
                         console.log(response.data.results[0])
-                        res.json({"message":response.data.results[0].error})
+                        res.json({"message":"Invalid string representation of a datetime value"})
                     }else{
                         console.log(response.data.results)
                         res.json({"valueIn":response.data.results[0].rows[0][0],"valueOut":response.data.results[1].rows[0][0]})//respuesta con success(json)
