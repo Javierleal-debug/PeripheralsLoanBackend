@@ -176,14 +176,14 @@ module.exports.changeUserType = (req,res) => {
                 try{
                     if(response.data.results[0].error){
                         console.log(response.data.results[0])
-                        return res.json({message:response.data.results[0].error})
+                        return res.status(404).json({message:"User not found"})
                     }else{
                         console.log(response.data.results[0])
                         res.json({message:"success"})//respuesta con success(json)
                     }
                 } catch(error){
                     console.error(error);//errorHandling
-                    return res.status(404).json({message:error})
+                    return res.status(404).json({message:"error"})
                 }
             })
     })
