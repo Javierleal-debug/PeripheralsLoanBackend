@@ -57,9 +57,13 @@ module.exports.createUser = (req,res) => {
 module.exports.changePasswordAdmin = (req,res) => {
     const onlyAllowedPattern = /^[-.@_A-Za-z0-9]+$/;
     if(!req.body.newPwd.match(onlyAllowedPattern)){
-      return res.status(400).json({ message: "No special characters on password, please!"})
-    }
+        return res.status(400).json({ message: "No special characters on password, please!"})
+      }
+    
     const {employeeEmail} = req.body;
+    if(!employeeEmail.match(onlyAllowedPattern)){
+        return res.status(400).json({ message: "No special characters on email, please!"})
+    }
     if(employeeEmail.length<1 || employeeEmail.length>254 || req.body.newPwd.length<1 || req.body.newPwd.length>21){
         return res.status(400).json({message:"Please provide the neccesary data"})
     }
@@ -107,6 +111,9 @@ module.exports.changePassword = (req,res) => {
       return res.status(400).json({ message: "No special characters on password, please!"})
     }
     const {employeeEmail} = req.body;
+    if(!employeeEmail.match(onlyAllowedPattern)){
+        return res.status(400).json({ message: "No special characters on email, please!"})
+    }
     if(employeeEmail.length<1 || employeeEmail.length>254 || req.body.newPwd.length<1){
         return res.status(400).json({message:"Please provide the neccesary data"})
     }
@@ -149,7 +156,15 @@ module.exports.changePassword = (req,res) => {
 }
 
 module.exports.changeUserType = (req,res) => {
+    const onlyAllowedPattern = /^[-.@_A-Za-z0-9]+$/;
+    const onlyAllowedUserTypePattern = /^[0-2]+$/;
     const {employeeEmail,userType} = req.body;
+    if(!employeeEmail.match(onlyAllowedPattern)){
+        return res.status(400).json({ message: "No special characters on email, please!"})
+    }
+    if(!userType.match(onlyAllowedUserTypePattern)){
+        return res.status(400).json({ message: "Non valid User Type"})
+    }
     if(employeeEmail.length<1 || employeeEmail.length>254 || userType.length<1){
         return res.status(400).json({message:"Please provide the neccesary data"})
     }
@@ -190,7 +205,12 @@ module.exports.changeUserType = (req,res) => {
 }
 
 module.exports.deleteUser = (req,res) => {
+    const onlyAllowedPattern = /^[-.@_A-Za-z0-9 ]+$/;
     const {employeeEmail,mngrEmail,mngrName} = req.body;
+    var query=employeeEmail+mngrEmail+mngrName;
+    if(!query.match(onlyAllowedPattern)){
+        return res.status(400).json({ message: "No special characters on data, please!"})
+    }
     if(employeeEmail.length<1 || employeeEmail.length>254){
         return res.status(400).json({message:"Please provide the neccesary data"})
     }
@@ -271,15 +291,21 @@ module.exports.getUsers = (req,res) =>{
                         res.json(users)
                 } catch(error){
                     console.error(error);//errorHandling
-                    return res.status(404).json({message:error})
+                    return res.status(404).json({message:"error"})
                 }
             })
     })            
 }
 
 module.exports.getUser = (req,res) =>{
+    const onlyAllowedPattern = /^[-.@_A-Za-z0-9]+$/;
     var {email} = req.params;
-    email=email.toLowerCase();
+    if(!email.match(onlyAllowedPattern)){
+        return res.status(400).json({ message: "No special characters on data, please!"})
+    }
+    if(email.length<1 || employeeEmail.length>254){
+        return res.status(400).json({message:"Please provide the neccesary data"})
+    }
     const token = req.body.bearerToken;
     const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
     const queryData = {
@@ -323,8 +349,13 @@ module.exports.getUser = (req,res) =>{
 
 module.exports.getUserName = (req,res) =>{
     var email = req.body.email;
-    email=email.toLowerCase();
-    
+    const onlyAllowedPattern = /^[-.@_A-Za-z0-9]+$/;
+    if(!email.match(onlyAllowedPattern)){
+        return res.status(400).json({ message: "No special characters on data, please!"})
+    }
+    if(email.length<1 || email.length>254){
+        return res.status(400).json({message:"Please provide the neccesary data"})
+    }
     const token = req.body.bearerToken;
     const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
     const queryData = {
@@ -366,7 +397,16 @@ module.exports.getUserName = (req,res) =>{
 }
 
 module.exports.changeManager = (req,res) => {
+    const onlyAllowedPattern = /^[-.@_A-Za-z0-9 ]+$/;
+    const onlyAllowedEmailPattern = /^[-.@_A-Za-z0-9]+$/;
     const {employeeEmail,mngrEmail,mngrName} = req.body;
+    var emails=employeeEmail+mngrEmail;
+    if(!emails.match(onlyAllowedEmailPattern)){
+        return res.status(400).json({ message: "No special characters on data, please!"})
+    }
+    if(!mngrName.match(onlyAllowedPattern)){
+        return res.status(400).json({ message: "No special characters on data, please!"})
+    }
     if(employeeEmail.length<1 || employeeEmail.length>254 || mngrEmail.length<1 || mngrName.length>254 || mngrName.length<1 || mngrName.length>60){
         return res.status(400).json({message:"Please provide the neccesary data"})
     }

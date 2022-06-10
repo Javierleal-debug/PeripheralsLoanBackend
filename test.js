@@ -23,8 +23,8 @@ console.log(date.length);
 console.log(date);
 const pwd=bcrypt.hashSync("wilebaldo123",8);
 console.log(pwd)
-const onlyLettersPattern = /^[-.@_A-Za-z0-9 ]+$/;
-var userQuery="drop table-_ @ peripheral";
+const onlyLettersPattern = /^[0-2]+$/;
+var userQuery="2";
 console.log(userQuery.match(onlyLettersPattern))
 if(!userQuery.match(onlyLettersPattern)){
     console.log( "No special characters, please!")

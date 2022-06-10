@@ -13,7 +13,6 @@ const verifyPeripheralBodyMaxLength = (req,res,next) => {
     serialNumber+=req.body.serialNumber;
     employeeName+=req.body.employeeName;
     employeeEmail+=req.body.employeeEmail;
-    employeeEmail=employeeEmail.toLowerCase();
     employeeSerial+=req.body.employeeSerial;
     comment+=req.body.comment;
     date+=req.body.date;
@@ -44,12 +43,10 @@ const verifyUserBodyMaxLength = (req,res,next) => {
     var name,email,serial,area,mngrName,mngrEmail = "";
     name+=req.body.name;
     email+=req.body.email;
-    email=email.toLowerCase();
     serial+=req.body.serial;
     area+=req.body.area;
     mngrName+=req.body.mngrName;
     mngrEmail+=req.body.mngrEmail;
-    mngrEmail=mngrEmail.toLowerCase()
     if(name.length > 60) {
         return res.json({message:"Invalid User Name length(max 60)"})
     } else if(email.length > 254) {
@@ -76,7 +73,6 @@ const verifyNoSQLInjection = (req,res,next) => {
     serialNumber+=req.body.serialNumber;
     employeeName+=req.body.employeeName;
     employeeEmail+=req.body.employeeEmail;
-    employeeEmail=employeeEmail.toLowerCase();
     employeeSerial+=req.body.employeeSerial
     comment+=req.body.comment;
     date+=req.body.date;
@@ -98,7 +94,6 @@ const verifyNoAuthSQLInjection = (req,res,next) => {
     area+=req.body.area;
     mngrName+=req.body.mngrName;
     mngrEmail+=req.body.mngrEmail;
-    mngrEmail=mngrEmail.toLowerCase();
     var userQuery=name+email+serial+area+mngrName+mngrEmail; 
     
     if(!userQuery.match(onlyAllowedPattern)){
