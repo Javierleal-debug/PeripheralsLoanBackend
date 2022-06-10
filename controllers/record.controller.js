@@ -84,7 +84,7 @@ module.exports.getRecordsByDate = (req,res) => {
     }
     const onlyAllowedPattern = /^[0-9 -]+$/;
     if(!date.match(onlyAllowedPattern)){
-        return res.status(400).json({ err: "No special characters, please!"})
+        return res.status(400).json({ message: "No special characters, please!"})
     }
     const token = req.body.bearerToken;
     const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";

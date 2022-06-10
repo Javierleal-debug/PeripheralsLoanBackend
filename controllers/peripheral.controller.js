@@ -98,7 +98,7 @@ module.exports.peripheral = (req,res)=>{
     }
     const onlyAllowedPattern = /^[A-Za-z0-9]+$/;
     if(!serialNumber.match(onlyAllowedPattern)){
-        return res.status(400).json({ err: "No special characters, please!"})
+        return res.status(400).json({ message: "No special characters, please!"})
     }
     const token = req.body.bearerToken;
     const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
@@ -193,12 +193,12 @@ module.exports.deletePeripheral = (req,res,next) => {
     }
     const onlyAllowedPattern = /^[A-Za-z0-9]+$/;
     if(!serialNumber.match(onlyAllowedPattern)){
-        return res.status(400).json({ err: "No special characters, please!"})
+        return res.status(400).json({ message: "No special characters, please!"})
     }
     const token = req.body.bearerToken;
     const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
     const queryData = {
-        "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "HIDDEN" = true, "COMMENT"='${comment}' WHERE "SERIALNUMBER" ='${serialNumber}' ;`,
+        "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "HIDDEN" = true, "COMMENT"='${comment}' WHERE "SERIALNUMBER" ='${serialNumber}' AND "HIDDEN"=false;`,
         "limit":10000,
         "separator":";",
         "stop_on_error":"yes"
@@ -223,27 +223,18 @@ module.exports.deletePeripheral = (req,res,next) => {
                         next();
                     }else{
                         console.log(response.data/*.results[0]*/)
-                        return res.json({message:response.data.results[0].warning})//respuesta con success(json)
+                        return res.json({message:"The Peripheral was not found"})//respuesta con success(json)
                     }
                     
                 } catch(error){
                     console.error(error);//errorHandling
-                    return res.status(404).json({message:"User not found"})
+                    return res.status(404).json({message:"Something went wrong"})
                 }
             })
     })
 }
 
 module.exports.deletePeripherals = (req,res,next) => {
-    for(i=0; i<req.body.array.length;i++){
-        if(!req.body.array[i].match(/^[-.@_A-Za-z0-9]+$/)){
-            return res.status(400).json({message: "No special characters, please!"})
-        }
-        if(req.body.array[i]<1 || req.body.array[i]>100){
-            return res.status(400).json({message:"Invalid data"})
-        }
-    };
-
     req.body.action="DELETE PERIPHERALS";
     const {comment} = req.body;
     const serialNumber = [];
@@ -253,7 +244,7 @@ module.exports.deletePeripherals = (req,res,next) => {
     const token = req.body.bearerToken;
     const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
     const queryData = {
-        "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "HIDDEN" = true, "COMMENT"='${comment}' WHERE "SERIALNUMBER" in (${serialNumber});`,//modificar "query data" con el query SQL
+        "commands":`UPDATE "SNT24490"."PERIPHERAL" SET "HIDDEN" = true, "COMMENT"='${comment}' WHERE "SERIALNUMBER" in (${serialNumber}) AND "HIDDEN"=false;`,//modificar "query data" con el query SQL
         "limit":1000000,
         "separator":";",
         "stop_on_error":"yes"
@@ -278,12 +269,12 @@ module.exports.deletePeripherals = (req,res,next) => {
                         next();
                     }else{
                         console.log(response.data/*.results[0]*/)
-                        return res.status(400).json({message:"Peripherals not found"})//respuesta con success(json)
+                        res.json({message:"The Peripheral was not found"})//respuesta con success(json)
                     }
                     
                 } catch(error){
                     console.error(error);//errorHandling
-                    return res.status(404).json({message:"Peripherals not found"})
+                    res.status(404).json({message:"Something went wrong"})
                 }
             })
     })
@@ -297,7 +288,7 @@ module.exports.peripheralsInAndOutByDate = (req,res) => {
     }
     const onlyAllowedPattern = /^[0-9 -]+$/;
     if(!date.match(onlyAllowedPattern)){
-        return res.status(400).json({ err: "No special characters, please!"})
+        return res.status(400).json({ message: "No special characters, please!"})
     }
     const token = req.body.bearerToken;
     const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
@@ -323,7 +314,7 @@ module.exports.peripheralsInAndOutByDate = (req,res) => {
                     if(response.data.results[0].error){
                         console.log(date);
                         console.log(response.data.results[0])
-                        res.json({"message":"Invalid string representation of a datetime value"})
+                        res.json({"message":response.data.results[0].error})
                     }else{
                         console.log(response.data.results)
                         res.json({"valueIn":response.data.results[0].rows[0][0],"valueOut":response.data.results[1].rows[0][0]})//respuesta con success(json)
@@ -698,7 +689,7 @@ module.exports.peripheralsInAndOutByDateData = (req,res) => {
     }
     const onlyAllowedPattern = /^[0-9 -]+$/;
     if(!date.match(onlyAllowedPattern)){
-        return res.status(400).json({ err: "No special characters, please!"})
+        return res.status(400).json({ message: "No special characters, please!"})
     }
     const token = req.body.bearerToken;
     const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";

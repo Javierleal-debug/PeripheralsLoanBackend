@@ -45,6 +45,6 @@ router.route('/accept/:serialNumberUrl')
 
 router.route('/:serialNumber')
     .get([hasToken,verifyToken,getBearerToken],controller.peripheral)
-    .delete([hasToken,verifyToken,verifyNoSQLInjection,verifyPeripheralBodyMaxLength,isFocal,getBearerToken,controller.deletePeripheral,record.recordGetInfo],record.createRecord)
+    .delete([hasToken,verifyToken,isFocal,getBearerToken,controller.deletePeripheral,record.recordGetInfo],record.createRecord)
 
 module.exports=router; 
