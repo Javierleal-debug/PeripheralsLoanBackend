@@ -20,37 +20,37 @@ module.exports.createUser = (req,res) => {
     const pwd=bcrypt.hashSync(req.body.pwd,8);
     const usertypeid=req.body.userTypeId;
 
-    var adminToken = req.headers['x-access-token'];
-    jwt.verify(adminToken,config.secret, (err,decoded) => {
-        const token = req.body.bearerToken;
-        const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
-        const queryData = {
-            "commands":`INSERT
-            INTO  "SNT24490"."USERS" ("NAME","EMAIL","SERIAL","AREA","MNGRNAME","MNGREMAIL","PASSWORD","USERTYPE")
-            VALUES('${employeeName}', '${employeeEmail}', '${employeeSerial}', '${employeeArea}', '${mngrName}', '${mngrEmail}', '${pwd}', ${usertypeid});`, //actualizar esta query
-            "limit":10,
-            "separator":";",
-            "stop_on_error":"yes"
+    if(employeeName.length<1 || employeeEmail.length<1 || employeeSerial.length<1 || employeeArea.length<1 || mngrName.length<1 || mngrEmail.length<1 || req.body.pwd.length<1 || usertypeid.length<1){
+        return res.status(400).json({message:"Please provide the neccesary data"})
+    }
+    const token = req.body.bearerToken;
+    const queryURL="https://bpe61bfd0365e9u4psdglite.db2.cloud.ibm.com/dbapi/v4/sql_jobs";
+    const queryData = {
+        "commands":`INSERT
+        INTO  "SNT24490"."USERS" ("NAME","EMAIL","SERIAL","AREA","MNGRNAME","MNGREMAIL","PASSWORD","USERTYPE")
+        VALUES('${employeeName}', '${employeeEmail}', '${employeeSerial}', '${employeeArea}', '${mngrName}', '${mngrEmail}', '${pwd}', ${usertypeid});`, //actualizar esta query
+        "limit":10,
+        "separator":";",
+        "stop_on_error":"yes"
+    }
+    const queryConf = {
+        headers: {
+            "authorization": `Bearer ${token}`,
+            "csontent-Type": 'application/json',
+            "x-deployment-id": credentials.DB_DEPLOYMENT_ID
         }
-        const queryConf = {
-            headers: {
-                "authorization": `Bearer ${token}`,
-                "csontent-Type": 'application/json',
-                "x-deployment-id": credentials.DB_DEPLOYMENT_ID
-            }
-        }
-        axios.post(queryURL,queryData,queryConf)
+    }
+    axios.post(queryURL,queryData,queryConf)
+    .then(response => {
+        const getDataUrl = `${queryURL}/${response.data.id}`
+        axios.get(getDataUrl,queryConf)
         .then(response => {
-            const getDataUrl = `${queryURL}/${response.data.id}`
-            axios.get(getDataUrl,queryConf)
-            .then(response => {
-                if(response.data.results[0].error){
-                    res.status(404).json({"message":"Something went wrong"})
-                }else {
-                    res.json({"message":"success"})
-                }
-            })
-        })            
+            if(response.data.results[0].error){
+                res.status(404).json({"message":"Something went wrong"})
+            }else {
+                res.json({"message":"success"})
+            }
+        })
     })
 }
 
@@ -87,9 +87,9 @@ module.exports.changePasswordAdmin = (req,res) => {
         axios.get(getDataUrl,queryConf)
             .then(response => {
                 try{
-                    if(response.data.results[0].error){
+                    if(response.data.results[0].error || response.data.results[0].warning){
                         console.log(response.data.results[0])
-                        return res.json({message:"Something is wrong"})
+                        return res.status(404).json({message:"Something is wrong"})
                     }else{
                         console.log(response.data.results[0])
                         res.json({message:"success"})//respuesta con success(json)
