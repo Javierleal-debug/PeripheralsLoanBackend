@@ -307,7 +307,7 @@ module.exports.getUser = (req,res) =>{
     if(!email.match(onlyAllowedPattern)){
         return res.status(400).json({ message: "No special characters on data, please!"})
     }
-    if(email.length<1 || employeeEmail.length>254){
+    if(email.length<1 || email.length>254){
         return res.status(400).json({message:"Please provide the neccesary data"})
     }
     const token = req.body.bearerToken;
