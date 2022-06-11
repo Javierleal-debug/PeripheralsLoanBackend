@@ -162,7 +162,7 @@ module.exports.changeUserType = (req,res) => {
     if(!employeeEmail.match(onlyAllowedPattern)){
         return res.status(400).json({ message: "No special characters on email, please!"})
     }
-    if(!userType.match(onlyAllowedUserTypePattern)){
+    if(!userType.toString().match(onlyAllowedUserTypePattern)){
         return res.status(400).json({ message: "Non valid User Type"})
     }
     if(employeeEmail.length<1 || employeeEmail.length>254 || userType.length<1){
