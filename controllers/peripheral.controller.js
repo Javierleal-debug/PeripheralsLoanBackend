@@ -853,9 +853,9 @@ module.exports.peripheralAcceptConditions = (req,res,next) => {
             axios.get(getDataUrl,queryConf)
                 .then(response => {
                     try{
-                        if(response.data.results[0].error){
+                        if(response.data.results[0].error || response.data.results[0].warning){
                             console.log(response.data.results[0])
-                            return res.json({message:response.data.results[0].error})
+                            return res.status(404).json({message:"error"})
                         }else{
                             req.body.serialNumber = serialNumber;
                             res.json({message:"success",serialNumber:serialNumber})
@@ -864,7 +864,7 @@ module.exports.peripheralAcceptConditions = (req,res,next) => {
                         }
                     } catch(error){
                         console.error(error);//errorHandling
-                        return res.status(404).json({message:error})
+                        return res.status(404).json({message:"error"})
                     }
                 })
         })
