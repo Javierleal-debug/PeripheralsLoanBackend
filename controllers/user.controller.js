@@ -48,7 +48,7 @@ module.exports.createUser = (req,res) => {
             if(response.data.results[0].error){
                 res.status(404).json({"message":"Something went wrong"})
             }else {
-                res.json.status(201)({"message":"success"})
+                res.status(201).json({"message":"success"})
             }
         })
     })
