@@ -1,5 +1,5 @@
 applications:
 - name: peripheralsloanbackend
-  memory: 64M
+  memory: 1023M
   command: node index.js
   buildpack: https://github.com/cloudfoundry/nodejs-buildpack

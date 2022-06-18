@@ -66,8 +66,7 @@ const verifyUserBodyMaxLength = (req,res,next) => {
 
 const verifyNoSQLInjection = (req,res,next) => {
     const onlyAllowedPattern = /^[-.@_A-Za-z0-9 ]+$/;
-    var type,brand,model,serialNumber,employeeName,employeeEmail,employeeSerial,comment,date = "";
-    type=type+req.body.type;
+    var brand,model,serialNumber,employeeName,employeeEmail,employeeSerial,comment,date = "";
     brand+=req.body.brand;
     model+=req.body.model;
     serialNumber+=req.body.serialNumber;
@@ -76,7 +75,7 @@ const verifyNoSQLInjection = (req,res,next) => {
     employeeSerial+=req.body.employeeSerial
     comment+=req.body.comment;
     date+=req.body.date;
-    var userQuery=""+type+brand+model+serialNumber+employeeName+employeeEmail+employeeSerial+comment+date;
+    var userQuery=""+brand+model+serialNumber+employeeName+employeeEmail+employeeSerial+comment+date;
     
     if(!userQuery.match(onlyAllowedPattern)){
         return res.status(400).json({ message: "No special characters, please!"})
